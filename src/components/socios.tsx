@@ -46,19 +46,19 @@ export function Socios() {
       />
       <div className="grid gap-6 lg:grid-cols-2">
         {SOCIOS.map((s) => (
-          <article key={s.nome} className="flex flex-col rounded-xl border border-line p-8">
+          <article key={s.nome} className="flex flex-col">
             {s.foto ? (
               <img
                 src={s.foto}
                 alt={`${s.nome}, ${s.cargo}`}
                 loading="lazy"
-                className="mb-6 aspect-[4/3] w-full rounded-lg object-cover object-[50%_20%]"
+                className="mb-6 aspect-[4/3] w-full rounded-2xl object-cover object-[50%_20%]"
               />
             ) : (
               <div
                 role="img"
                 aria-label={`Foto de ${s.nome} em breve`}
-                className="mb-6 flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-dashed border-line"
+                className="mb-6 flex aspect-[4/3] w-full items-center justify-center rounded-2xl bg-[#0f0f0f]"
               >
                 <span className="text-5xl font-extrabold text-accent/60">{s.iniciais}</span>
               </div>
@@ -68,7 +68,7 @@ export function Socios() {
             <p className="mt-2 font-medium text-accent">{s.territorio}</p>
             <p className="mt-5 leading-relaxed text-paper/75">{s.resumo}</p>
 
-            <ul className="mt-6 space-y-2 text-sm text-paper/90">
+            <ul className="mt-6 mb-8 space-y-2 text-sm text-paper/90">
               {s.competencias.map((c) => (
                 <li key={c} className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
@@ -78,7 +78,7 @@ export function Socios() {
             </ul>
 
             {s.numeros.length > 0 && (
-              <dl className="mt-auto grid grid-cols-2 gap-4 border-t border-line pt-6">
+              <dl className="mt-auto grid grid-cols-2 gap-4 pt-8">
                 {s.numeros.map((n) => (
                   <div key={n.l}>
                     <dt className="text-2xl font-extrabold text-accent">{n.v}</dt>
