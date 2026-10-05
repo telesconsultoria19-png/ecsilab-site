@@ -2,7 +2,7 @@ import { EnergyFlow } from "@/components/energy-flow";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-line">
+    <section className="relative overflow-hidden">
       <EnergyFlow className="opacity-60 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]" />
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-24">
         <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
