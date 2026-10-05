@@ -2,6 +2,8 @@ import { Section, SectionHead } from "@/components/ui-bits";
 
 const SOCIOS = [
   {
+    foto: "/marcelo-teles.jpg" as string | null,
+    iniciais: "MT",
     nome: "Marcelo Teles",
     cargo: "Co-founder e CEO",
     territorio: "Growth, marketing e processos, com a Teoria das Restrições",
@@ -18,6 +20,8 @@ const SOCIOS = [
     ],
   },
   {
+    foto: null as string | null,
+    iniciais: "MS",
     nome: "Marcos Schneider",
     cargo: "Co-founder e CPO · CEO do Grupo MS",
     territorio: "Growth, marketing, finanças e modelagem de negócio",
@@ -43,6 +47,22 @@ export function Socios() {
       <div className="grid gap-6 lg:grid-cols-2">
         {SOCIOS.map((s) => (
           <article key={s.nome} className="flex flex-col rounded-xl border border-line p-8">
+            {s.foto ? (
+              <img
+                src={s.foto}
+                alt={`${s.nome}, ${s.cargo}`}
+                loading="lazy"
+                className="mb-6 aspect-[4/3] w-full rounded-lg object-cover object-[50%_20%]"
+              />
+            ) : (
+              <div
+                role="img"
+                aria-label={`Foto de ${s.nome} em breve`}
+                className="mb-6 flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-dashed border-line"
+              >
+                <span className="text-5xl font-extrabold text-accent/60">{s.iniciais}</span>
+              </div>
+            )}
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">{s.cargo}</p>
             <h3 className="mt-3 text-3xl font-extrabold">{s.nome}</h3>
             <p className="mt-2 font-medium text-accent">{s.territorio}</p>
