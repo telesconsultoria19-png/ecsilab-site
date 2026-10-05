@@ -3,6 +3,7 @@ import { EnergyFlow } from "@/components/energy-flow";
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
+      <div aria-hidden="true" className="tech-grid pointer-events-none absolute inset-0" />
       <EnergyFlow className="opacity-60 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]" />
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-24">
         <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
@@ -11,7 +12,7 @@ export function Hero() {
 
         <h1 className="max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
           Enquanto o mercado segue o rebanho,{" "}
-          <span className="text-accent">a gente inventa o pasto.</span>
+          <span className="shimmer-text">a gente inventa o pasto.</span>
         </h1>
 
         <p className="mt-8 max-w-2xl text-lg leading-relaxed text-paper/80 sm:text-xl">
@@ -22,13 +23,13 @@ export function Hero() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <a
             href="#contato"
-            className="rounded-md bg-accent px-6 py-3.5 text-center font-semibold text-ink transition-opacity hover:opacity-90"
+            className="btn-neon rounded-xl bg-accent px-6 py-3.5 text-center font-semibold text-ink"
           >
             Acelerar meu faturamento
           </a>
           <a
             href="#diagnostico"
-            className="rounded-md border border-paper/40 px-6 py-3.5 text-center font-semibold text-paper transition-colors hover:border-accent hover:text-accent"
+            className="rounded-xl bg-white/[0.06] px-6 py-3.5 text-center font-semibold text-paper backdrop-blur transition hover:bg-white/10 hover:text-accent"
           >
             Receber diagnóstico grátis
           </a>

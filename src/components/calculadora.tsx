@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Section, SectionHead } from "@/components/ui-bits";
+import { GlowCard, Section, SectionHead } from "@/components/ui-bits";
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
@@ -86,7 +86,7 @@ export function Calculadora() {
       />
 
       <div className="grid gap-10 lg:grid-cols-2">
-        <div className="space-y-8 rounded-xl border border-line p-6 sm:p-8">
+        <GlowCard className="space-y-8 p-6 sm:p-8">
           <Slider
             label="Custo de aquisição (CAC)"
             ajuda="Quanto você gasta em marketing e vendas para trazer 1 cliente."
@@ -117,9 +117,9 @@ export function Calculadora() {
             step={1}
             onChange={setFreq}
           />
-        </div>
+        </GlowCard>
 
-        <div className="flex flex-col rounded-xl border border-line p-6 sm:p-8">
+        <GlowCard className="flex flex-col p-6 sm:p-8">
           <dl className="grid grid-cols-2 gap-4">
             <div>
               <dt className="text-sm text-paper/60">LTV anual</dt>
@@ -137,11 +137,11 @@ export function Calculadora() {
           </p>
           <a
             href="#contato"
-            className="mt-4 rounded-md bg-accent px-6 py-3.5 text-center font-semibold text-ink hover:opacity-90"
+            className="btn-neon mt-4 rounded-xl bg-accent px-6 py-3.5 text-center font-semibold text-ink"
           >
             Ver o diagnóstico completo
           </a>
-        </div>
+        </GlowCard>
       </div>
     </Section>
   );

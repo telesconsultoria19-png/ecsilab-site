@@ -1,4 +1,4 @@
-import { Section, SectionHead } from "@/components/ui-bits";
+import { CountUp, Section, SectionHead } from "@/components/ui-bits";
 
 const SOCIOS = [
   {
@@ -15,8 +15,8 @@ const SOCIOS = [
       "Tráfego, funil e máquina de vendas",
     ],
     numeros: [
-      { v: "+250", l: "consultorias realizadas" },
-      { v: "+R$ 30 mi", l: "gerenciados em tráfego" },
+      { v: 250, prefix: "+", suffix: "", d: 0, l: "consultorias realizadas" },
+      { v: 30, prefix: "+R$ ", suffix: " mi", d: 0, l: "gerenciados em tráfego" },
     ],
   },
   {
@@ -32,7 +32,7 @@ const SOCIOS = [
       "Modelagem de negócio e de receita",
       "Governança comercial de quem opera um grupo",
     ],
-    numeros: [],
+    numeros: [] as Array<{ v: number; prefix: string; suffix: string; d: number; l: string }>,
   },
 ];
 
@@ -46,7 +46,7 @@ export function Socios() {
       />
       <div className="grid gap-6 lg:grid-cols-2">
         {SOCIOS.map((s) => (
-          <article key={s.nome} className="flex flex-col">
+          <article key={s.nome} className="reveal flex flex-col">
             {s.foto ? (
               <img
                 src={s.foto}
@@ -81,7 +81,9 @@ export function Socios() {
               <dl className="mt-auto grid grid-cols-2 gap-4 pt-8">
                 {s.numeros.map((n) => (
                   <div key={n.l}>
-                    <dt className="text-2xl font-extrabold text-accent">{n.v}</dt>
+                    <dt className="text-3xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)]">
+                      <CountUp value={n.v} prefix={n.prefix} suffix={n.suffix} decimals={n.d} />
+                    </dt>
                     <dd className="mt-1 text-sm text-paper/70">{n.l}</dd>
                   </div>
                 ))}

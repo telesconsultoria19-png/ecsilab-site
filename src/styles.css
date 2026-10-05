@@ -23,3 +23,85 @@ body {
 section[id] {
   scroll-margin-top: 5rem;
 }
+
+/* ===== Linguagem futurista ===== */
+
+/* Texto amarelo com brilho que percorre as letras */
+.shimmer-text {
+  background: linear-gradient(100deg, #fdca0a 20%, #fff4b0 45%, #fdca0a 70%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%, 100% { background-position: 100% 0; }
+  50% { background-position: 0% 0; }
+}
+
+/* Superfície de vidro escuro com luz que segue o mouse */
+.glow-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(253, 202, 10, 0.16), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.glow-card:hover {
+  box-shadow: 0 0 60px -20px rgba(253, 202, 10, 0.35);
+}
+.glow-card:hover::before {
+  opacity: 1;
+}
+.glow-card > * {
+  position: relative;
+}
+
+/* Botão primário com halo neon */
+.btn-neon {
+  box-shadow: 0 0 0 0 rgba(253, 202, 10, 0.5), 0 0 28px -4px rgba(253, 202, 10, 0.55);
+  transition: box-shadow 0.3s ease, transform 0.3s ease, opacity 0.2s ease;
+}
+.btn-neon:hover {
+  box-shadow: 0 0 0 4px rgba(253, 202, 10, 0.12), 0 0 44px -2px rgba(253, 202, 10, 0.75);
+  transform: translateY(-1px);
+}
+
+/* Grade técnica bem sutil, que se dissolve nas bordas */
+.tech-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 70%);
+  mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 70%);
+}
+
+/* Entrada ao rolar (sem JavaScript; sem suporte, o conteúdo só aparece normal) */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+  @keyframes reveal-rise {
+    from { opacity: 0; transform: translateY(36px); filter: blur(6px); }
+    to { opacity: 1; transform: none; filter: none; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text { animation: none; }
+  .reveal { animation: none; }
+  html { scroll-behavior: auto; }
+}

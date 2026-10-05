@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Section, SectionHead, PrimaryButton, inputCls } from "@/components/ui-bits";
+import { GlowCard, Section, SectionHead, PrimaryButton, inputCls } from "@/components/ui-bits";
 import { submitLead } from "@/lib/leads";
 
 type Cat = "traffic" | "conversion" | "process";
@@ -114,7 +114,7 @@ export function Diagnostico() {
         lead="Baseado na Teoria das Restrições. Responda a três perguntas e veja onde o seu crescimento está travado."
       />
 
-      <div className="max-w-3xl rounded-xl border border-line p-6 sm:p-10">
+      <GlowCard className="max-w-3xl p-6 sm:p-10">
         {!resultado && pergunta && (
           <>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">
@@ -137,10 +137,10 @@ export function Diagnostico() {
                       setRespostas(novo);
                       setAviso(false);
                     }}
-                    className={`w-full rounded-md border px-5 py-4 text-left transition-colors ${
+                    className={`w-full rounded-xl border px-5 py-4 text-left transition ${
                       ativo
-                        ? "border-accent bg-accent/10 text-paper"
-                        : "border-paper/25 text-paper/85 hover:border-accent/60"
+                        ? "border-accent/70 bg-accent/10 text-paper shadow-[0_0_30px_-10px_rgba(253,202,10,0.7)]"
+                        : "border-white/10 bg-white/[0.03] text-paper/85 hover:border-accent/50"
                     }`}
                   >
                     {o.t}
@@ -179,13 +179,13 @@ export function Diagnostico() {
 
         {resultado && (
           <div>
-            <span className="inline-block rounded-full border border-accent px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent">
+            <span className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent">
               Restrição crítica detectada
             </span>
             <h3 className="mt-5 text-3xl font-extrabold">{RESULTADOS[resultado].titulo}</h3>
             <p className="mt-4 text-lg leading-relaxed text-paper/80">{RESULTADOS[resultado].texto}</p>
 
-            <div className="mt-8 rounded-lg border border-line p-5">
+            <div className="mt-8 rounded-xl bg-white/[0.05] p-5">
               <p className="font-semibold text-accent">Solução recomendada pela ecsilab</p>
               <p className="mt-2 text-paper/80">
                 Estruturamos e rodamos o processo ágil de marketing e vendas da sua empresa, com
@@ -219,21 +219,21 @@ export function Diagnostico() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
                 href="#contato"
-                className="rounded-md bg-accent px-6 py-3.5 text-center font-semibold text-ink hover:opacity-90"
+                className="btn-neon rounded-xl bg-accent px-6 py-3.5 text-center font-semibold text-ink"
               >
                 Quebrar esse gargalo agora
               </a>
               <button
                 type="button"
                 onClick={refazer}
-                className="rounded-md border border-paper/40 px-6 py-3.5 font-semibold hover:border-accent hover:text-accent"
+                className="rounded-xl bg-white/[0.06] px-6 py-3.5 font-semibold transition hover:bg-white/10 hover:text-accent"
               >
                 Refazer teste
               </button>
             </div>
           </div>
         )}
-      </div>
+      </GlowCard>
     </Section>
   );
 }

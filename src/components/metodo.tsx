@@ -1,4 +1,4 @@
-import { Section, SectionHead } from "@/components/ui-bits";
+import { Eyebrow, GlowCard, Section, SectionHead } from "@/components/ui-bits";
 
 const PILARES = [
   {
@@ -40,11 +40,9 @@ export function Metodo() {
   return (
     <>
       <Section id="gargalos">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="reveal grid gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
-              A dura realidade do mercado
-            </p>
+            <Eyebrow>A dura realidade do mercado</Eyebrow>
             <h2 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
               O marketing tradicional virou moda.{" "}
               <span className="text-accent">E moda não paga conta.</span>
@@ -77,11 +75,11 @@ export function Metodo() {
         />
         <div className="grid gap-6 md:grid-cols-3">
           {PILARES.map((p) => (
-            <article key={p.n} className="rounded-xl border border-line p-7">
+            <GlowCard as="article" key={p.n} className="p-8">
               <p className="text-sm font-semibold text-accent">{p.n}</p>
               <h3 className="mt-3 text-2xl font-bold">{p.titulo}</h3>
               <p className="mt-4 leading-relaxed text-paper/75">{p.texto}</p>
-              <ul className="mt-6 space-y-2 border-t border-line pt-5 text-sm text-paper/90">
+              <ul className="mt-6 space-y-2 pt-2 text-sm text-paper/90">
                 {p.itens.map((i) => (
                   <li key={i} className="flex gap-3">
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
@@ -89,7 +87,7 @@ export function Metodo() {
                   </li>
                 ))}
               </ul>
-            </article>
+            </GlowCard>
           ))}
         </div>
       </Section>

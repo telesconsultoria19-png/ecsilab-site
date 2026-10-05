@@ -13,7 +13,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-ink/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <a href="/" aria-label="ecsilab, página inicial" className="flex items-center">
           <img src="/logo-ecsilab.png" alt="ecsilab" className="h-8 w-auto" />
@@ -34,7 +34,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <a
             href="#contato"
-            className="hidden rounded-md bg-accent px-4 py-2 text-sm font-semibold text-ink transition-opacity hover:opacity-90 sm:inline-block"
+            className="hidden btn-neon rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-ink sm:inline-block"
           >
             Agendar diagnóstico
           </a>
@@ -51,7 +51,7 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <nav className="border-t border-line bg-ink px-4 py-4 md:hidden" aria-label="Menu móvel">
+        <nav className="border-t border-white/5 bg-ink px-4 py-4 md:hidden" aria-label="Menu móvel">
           <ul className="flex flex-col gap-1">
             {NAV.map((item) => (
               <li key={item.href}>

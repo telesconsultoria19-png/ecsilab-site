@@ -1,27 +1,31 @@
-import { Section, SectionHead } from "@/components/ui-bits";
+import { CountUp, GlowCard, Section, SectionHead } from "@/components/ui-bits";
 
-const AMOSTRA = [
-  { v: "16", l: "campanhas na amostra" },
-  { v: "R$ 258.989", l: "investido no recorte" },
-  { v: "5.358", l: "leads gerados" },
-  { v: "3,1 mi", l: "alcance acumulado" },
+type Item = { v: number; d?: number; prefix?: string; suffix?: string; l: string };
+
+const AMOSTRA: Item[] = [
+  { v: 16, l: "campanhas na amostra" },
+  { v: 258989, prefix: "R$ ", l: "investido no recorte" },
+  { v: 5358, l: "leads gerados" },
+  { v: 3.1, d: 1, suffix: " mi", l: "alcance acumulado" },
 ];
 
-const RETORNO = [
-  { v: "R$ 108.000", l: "vendas pontuais" },
-  { v: "R$ 1.603.092", l: "projeção anual em receita recorrente" },
-  { v: "R$ 46.142", l: "investidos em anúncios no ano" },
-  { v: "37,1x", l: "relação LTV / CAC do período" },
+const RETORNO: Item[] = [
+  { v: 108000, prefix: "R$ ", l: "vendas pontuais" },
+  { v: 1603092, prefix: "R$ ", l: "projeção anual em receita recorrente" },
+  { v: 46142, prefix: "R$ ", l: "investidos em anúncios no ano" },
+  { v: 37.1, d: 1, suffix: "x", l: "relação LTV / CAC do período" },
 ];
 
-function Grid({ itens }: { itens: Array<{ v: string; l: string }> }) {
+function Grid({ itens }: { itens: Item[] }) {
   return (
-    <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line lg:grid-cols-4">
+    <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       {itens.map((i) => (
-        <div key={i.l} className="bg-ink p-6">
-          <dt className="text-2xl font-extrabold text-accent sm:text-3xl">{i.v}</dt>
+        <GlowCard key={i.l} className="p-6">
+          <dt className="text-2xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)] sm:text-3xl">
+            <CountUp value={i.v} decimals={i.d ?? 0} prefix={i.prefix ?? ""} suffix={i.suffix ?? ""} />
+          </dt>
           <dd className="mt-2 text-sm text-paper/70">{i.l}</dd>
-        </div>
+        </GlowCard>
       ))}
     </dl>
   );

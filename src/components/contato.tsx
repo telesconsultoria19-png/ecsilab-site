@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
+import { EnergyFlow } from "@/components/energy-flow";
+import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
 import { FAIXAS_FATURAMENTO, submitLead } from "@/lib/leads";
 
 export function Contato() {
@@ -28,14 +29,20 @@ export function Contato() {
   }
 
   return (
-    <Section id="contato" tone="soft">
+    <Section
+      id="contato"
+      tone="soft"
+      bg={
+        <EnergyFlow className="opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)]" />
+      }
+    >
       <SectionHead
         eyebrow="Agendamento"
         title="Inicie o seu experimento estratégico"
         lead="Conte rapidamente o seu cenário. Marcelo Teles, Marcos Schneider ou nossa equipe falam com você para validar o melhor próximo passo."
       />
 
-      <div className="max-w-2xl rounded-xl border border-line p-6 sm:p-10">
+      <GlowCard className="max-w-2xl p-6 sm:p-10">
         {estado === "ok" ? (
           <div>
             <h3 className="text-2xl font-bold text-accent">Recebemos o seu pedido</h3>
@@ -86,7 +93,7 @@ export function Contato() {
             </PrimaryButton>
           </form>
         )}
-      </div>
+      </GlowCard>
     </Section>
   );
 }

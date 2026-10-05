@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
+import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
 import { submitLead } from "@/lib/leads";
 import { CATEGORIAS, SOLUCOES, type Solucao } from "@/lib/solucoes";
 
@@ -32,11 +32,11 @@ function Interesse({ solucao, onClose }: { solucao: Solucao; onClose: () => void
       role="dialog"
       aria-modal="true"
       aria-label={`Interesse em ${solucao.nome}`}
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/80 p-4 sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-black/80 p-4 backdrop-blur-sm sm:items-center"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl border border-line bg-ink p-6 sm:p-8"
+        className="w-full max-w-md rounded-2xl bg-[#0c0c0c] p-6 shadow-[0_0_80px_-20px_rgba(253,202,10,0.45)] sm:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Quero esta solução</p>
@@ -102,7 +102,7 @@ export function SolucoesIA() {
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-accent">{cat}</h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {SOLUCOES.filter((s) => s.categoria === cat).map((s) => (
-                <article key={s.slug} className="flex flex-col rounded-xl border border-line p-6">
+                <GlowCard as="article" key={s.slug} className="flex flex-col p-6">
                   <h4 className="text-lg font-bold">{s.nome}</h4>
                   <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{s.descricao}</p>
                   <button
@@ -112,7 +112,7 @@ export function SolucoesIA() {
                   >
                     Quero esta solução →
                   </button>
-                </article>
+                </GlowCard>
               ))}
             </div>
           </div>
