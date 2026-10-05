@@ -34,7 +34,7 @@ export function EnergyFlow({ className = "" }: { className?: string }) {
     };
 
     const draw = (now: number) => {
-      const t = reduce ? 4 : (now - start) / 1000;
+      const t = reduce ? 4 : ((now - start) / 1000) * 0.5;
       ctx.clearRect(0, 0, width, height);
       ctx.globalCompositeOperation = "lighter";
       ctx.lineCap = "round";
@@ -58,16 +58,19 @@ export function EnergyFlow({ className = "" }: { className?: string }) {
           else path.lineTo(x, y);
         }
 
-        // Três passadas: halo largo, brilho médio e núcleo fino = efeito neon.
-        ctx.strokeStyle = `rgba(${COLOR}, ${(0.05 * strength).toFixed(3)})`;
-        ctx.lineWidth = 14;
-        ctx.stroke(path);
-        ctx.strokeStyle = `rgba(${COLOR}, ${(0.12 * strength).toFixed(3)})`;
-        ctx.lineWidth = 5;
-        ctx.stroke(path);
-        ctx.strokeStyle = `rgba(255, 236, 150, ${(0.55 * strength).toFixed(3)})`;
-        ctx.lineWidth = 1.1;
-        ctx.stroke(path);
+        // Camadas de luz do mais difuso ao mais fino: sem traço rígido, só brilho.
+        const layers: Array<[number, number, string]> = [
+          [30, 0.025, COLOR],
+          [18, 0.04, COLOR],
+          [10, 0.07, COLOR],
+          [5, 0.12, COLOR],
+          [2, 0.2, "255, 226, 110"],
+        ];
+        for (const [w, a, c] of layers) {
+          ctx.strokeStyle = `rgba(${c}, ${(a * strength).toFixed(3)})`;
+          ctx.lineWidth = w;
+          ctx.stroke(path);
+        }
       }
     };
 
