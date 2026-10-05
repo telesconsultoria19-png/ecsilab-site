@@ -1,11 +1,12 @@
 import { EnergyFlow } from "@/components/energy-flow";
+import { Marquee } from "@/components/marquee";
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div aria-hidden="true" className="tech-grid pointer-events-none absolute inset-0" />
       <EnergyFlow className="opacity-60 [mask-image:linear-gradient(to_bottom,transparent,black_25%,black_75%,transparent)]" />
-      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-24">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pb-24 sm:pt-24">
         <p className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
           Growth, processos e escala comercial
         </p>
@@ -40,6 +41,7 @@ export function Hero() {
           com método de engenharia estruturada e processos implacáveis.
         </blockquote>
       </div>
+      <Marquee />
     </section>
   );
 }
