@@ -9,11 +9,16 @@ const ENTREGAS = [
   "Gestão do Google Meu Negócio",
   "Estruturação de processos comerciais",
   "Estruturação de time comercial",
+  "Planejamento de metas por OKR",
+  "Consultoria de growth",
+  "Planejamento de expansão",
+  "Plano de ação para dominar o mercado",
   "Raio-X do marketing",
   "Inbound marketing",
   "Nutrição de leads por e-mail",
   "Criação de site",
   "Criação de blog",
+  "Implantação de ferramentas de IA",
   "Criação de ferramentas para consultores",
 ];
 
