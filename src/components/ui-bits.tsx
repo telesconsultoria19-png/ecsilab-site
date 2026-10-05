@@ -63,14 +63,18 @@ export function GlowCard({
   children,
   className = "",
   as: Tag = "div",
+  reveal = true,
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
   as?: "div" | "article";
-}) {
+  reveal?: boolean;
+} & React.HTMLAttributes<HTMLElement>) {
   return (
     <Tag
-      className={`glow-card reveal ${className}`}
+      className={`glow-card ${reveal ? "reveal" : ""} ${className}`}
+      {...rest}
       onPointerMove={(e: React.PointerEvent<HTMLElement>) => {
         const r = e.currentTarget.getBoundingClientRect();
         e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);

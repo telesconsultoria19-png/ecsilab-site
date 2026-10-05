@@ -87,6 +87,8 @@ function Interesse({ solucao, onClose }: { solucao: Solucao; onClose: () => void
 
 export function SolucoesIA() {
   const [aberta, setAberta] = useState<Solucao | null>(null);
+  const [cat, setCat] = useState<(typeof CATEGORIAS)[number]>(CATEGORIAS[0]);
+  const lista = SOLUCOES.filter((s) => s.categoria === cat);
 
   return (
     <Section id="solucoes-ia">
@@ -96,26 +98,46 @@ export function SolucoesIA() {
         lead="Soluções prontas que implantamos na sua empresa, uma a uma ou em pacotes, para ganhar velocidade em vendas, atendimento, finanças e gestão."
       />
 
-      <div className="space-y-14">
-        {CATEGORIAS.map((cat) => (
-          <div key={cat}>
-            <h3 className="mb-5 text-sm font-semibold uppercase tracking-widest text-accent">{cat}</h3>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {SOLUCOES.filter((s) => s.categoria === cat).map((s) => (
-                <GlowCard as="article" key={s.slug} className="flex flex-col p-6">
-                  <h4 className="text-lg font-bold">{s.nome}</h4>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{s.descricao}</p>
-                  <button
-                    type="button"
-                    onClick={() => setAberta(s)}
-                    className="mt-5 self-start text-sm font-semibold text-accent hover:underline"
-                  >
-                    Quero esta solução →
-                  </button>
-                </GlowCard>
-              ))}
-            </div>
-          </div>
+      <div role="tablist" aria-label="Categorias de soluções" className="reveal -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
+        {CATEGORIAS.map((c) => {
+          const ativa = c === cat;
+          const total = SOLUCOES.filter((s) => s.categoria === c).length;
+          return (
+            <button
+              key={c}
+              role="tab"
+              type="button"
+              aria-selected={ativa}
+              onClick={() => setCat(c)}
+              className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition ${
+                ativa
+                  ? "btn-neon bg-accent text-ink"
+                  : "bg-white/[0.06] text-paper/80 hover:bg-white/10 hover:text-accent"
+              }`}
+            >
+              {c} <span className={ativa ? "text-ink/60" : "text-paper/40"}>{total}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div
+        key={cat}
+        role="tabpanel"
+        className="mt-8 grid animate-[tab-in_0.45s_ease] gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      >
+        {lista.map((s) => (
+          <GlowCard as="article" reveal={false} key={s.slug} className="flex flex-col p-6">
+            <h4 className="text-lg font-bold">{s.nome}</h4>
+            <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{s.descricao}</p>
+            <button
+              type="button"
+              onClick={() => setAberta(s)}
+              className="mt-5 self-start text-sm font-semibold text-accent hover:underline"
+            >
+              Quero esta solução →
+            </button>
+          </GlowCard>
         ))}
       </div>
 

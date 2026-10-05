@@ -27,8 +27,8 @@ export const SOLUCOES: Solucao[] = [
       "Assistente que responde, qualifica e encaminha leads no WhatsApp com rapidez, para o comercial falar só com quem tem potencial.",
   },
   {
-    slug: "nina-talks",
-    nome: "Nina Talks (SDR por voz)",
+    slug: "lexia-talks",
+    nome: "Lexia Talks (SDR por voz)",
     categoria: "Comercial",
     descricao: "SDR com IA que conversa por voz para abordar e qualificar leads.",
   },

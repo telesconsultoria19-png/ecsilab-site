@@ -1,4 +1,5 @@
-import { CountUp, GlowCard, Section, SectionHead } from "@/components/ui-bits";
+import { CountUp, Eyebrow, GlowCard, Section } from "@/components/ui-bits";
+import { useScrollProgress } from "@/lib/use-scroll";
 
 type Item = { v: number; d?: number; prefix?: string; suffix?: string; l: string };
 
@@ -32,29 +33,56 @@ function Grid({ itens }: { itens: Item[] }) {
 }
 
 export function CaseG360() {
+  const [ref, p] = useScrollProgress<HTMLElement>();
+  // O número cresce entre 10% e 75% da cena.
+  const t = Math.min(1, Math.max(0, (p - 0.1) / 0.65));
+  const eased = 1 - Math.pow(1 - t, 3);
+
   return (
-    <Section id="case" tone="soft">
-      <SectionHead
-        eyebrow="Prova em campo"
-        title="O case G360"
-        lead="Um recorte real de tráfego pago e do retorno de caixa apresentado à diretoria do grupo, validando o método na prática."
-      />
+    <>
+      <section id="case" ref={ref} className="relative md:h-[240vh]">
+        <div className="md:sticky md:top-0 md:flex md:h-screen md:items-center md:overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/[0.08] blur-[130px]"
+          />
+          <div className="relative mx-auto w-full max-w-6xl px-4 py-20 text-center sm:px-6 md:py-0">
+            <div className="flex justify-center">
+              <Eyebrow>Prova em campo · case G360</Eyebrow>
+            </div>
+            <p
+              className="text-[5.5rem] font-extrabold leading-none tracking-tight text-accent drop-shadow-[0_0_40px_rgba(253,202,10,0.45)] sm:text-[9rem] lg:text-[13rem]"
+              aria-label="37,1 vezes"
+            >
+              {(37.1 * eased).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}x
+            </p>
+            <h2 className="mx-auto mt-4 max-w-2xl text-2xl font-bold sm:text-4xl">
+              de retorno sobre cada real investido em mídia paga
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-paper/70">
+              Relação LTV / CAC do ano-base 2024, apresentada à diretoria do grupo.
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <h3 className="mb-4 text-sm font-semibold uppercase tracking-widest text-paper/60">
-        Amostra de tráfego pago · recorte de múltiplos anos
-      </h3>
-      <Grid itens={AMOSTRA} />
+      <Section>
+        <h3 className="mb-4 text-sm font-semibold uppercase tracking-widest text-paper/60">
+          Amostra de tráfego pago · recorte de múltiplos anos
+        </h3>
+        <Grid itens={AMOSTRA} />
 
-      <h3 className="mb-4 mt-12 text-sm font-semibold uppercase tracking-widest text-paper/60">
-        Retorno apresentado à diretoria · ano-base 2024
-      </h3>
-      <Grid itens={RETORNO} />
+        <h3 className="mb-4 mt-12 text-sm font-semibold uppercase tracking-widest text-paper/60">
+          Retorno apresentado à diretoria · ano-base 2024
+        </h3>
+        <Grid itens={RETORNO} />
 
-      <p className="mt-6 max-w-3xl text-sm leading-relaxed text-paper/60">
-        Amostragem de um recorte do período; não representa o total de verba gerenciada. O cálculo
-        de LTV/CAC considera vendas pontuais e a projeção anual de receita recorrente sobre o
-        investimento total em mídia paga no ano; o setup não entra na conta.
-      </p>
-    </Section>
+        <p className="mt-6 max-w-3xl text-sm leading-relaxed text-paper/60">
+          Amostragem de um recorte do período; não representa o total de verba gerenciada. O cálculo
+          de LTV/CAC considera vendas pontuais e a projeção anual de receita recorrente sobre o
+          investimento total em mídia paga no ano; o setup não entra na conta.
+        </p>
+      </Section>
+    </>
   );
 }
