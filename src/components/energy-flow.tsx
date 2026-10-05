@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 
-const LINES = 26;
+const LINES = 14;
 const COLOR = "253, 202, 10";
 
 /**
- * Fundo animado: fitas de energia amarelas fluindo na horizontal.
+ * Fundo animado: fitas de luz neon amarela ondulando como água.
  * Desenhado em canvas (sem arquivo externo). Pausa fora da tela e
  * respeita "reduzir movimento" (desenha um único quadro estático).
  */
@@ -37,26 +37,37 @@ export function EnergyFlow({ className = "" }: { className?: string }) {
       const t = reduce ? 4 : (now - start) / 1000;
       ctx.clearRect(0, 0, width, height);
       ctx.globalCompositeOperation = "lighter";
-      ctx.lineWidth = 1.2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
 
       for (let i = 0; i < LINES; i++) {
         const k = i / (LINES - 1);
-        const baseY = height * (0.3 + 0.5 * k);
-        const amp = height * (0.05 + 0.08 * Math.sin(k * Math.PI));
-        const alpha = 0.12 + 0.5 * Math.sin(k * Math.PI);
-        ctx.strokeStyle = `rgba(${COLOR}, ${alpha.toFixed(3)})`;
-        ctx.beginPath();
-        for (let x = 0; x <= width + 8; x += 8) {
+        const baseY = height * (0.28 + 0.55 * k);
+        const amp = height * (0.07 + 0.1 * Math.sin(k * Math.PI));
+        const strength = 0.25 + 0.75 * Math.sin(k * Math.PI);
+
+        const path = new Path2D();
+        for (let x = 0; x <= width + 10; x += 10) {
           const p = x / width;
           const y =
             baseY +
-            Math.sin(p * 5 + t * 0.6 + k * 2.4) * amp +
-            Math.sin(p * 9 - t * 0.9 + k * 4) * amp * 0.45 +
-            Math.sin(p * 2 + t * 0.3) * amp * 0.7;
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+            Math.sin(p * 3.2 + t * 0.32 + k * 2.2) * amp +
+            Math.sin(p * 5.5 - t * 0.45 + k * 3.1) * amp * 0.4 +
+            Math.sin(p * 1.4 + t * 0.18 + k) * amp * 0.6;
+          if (x === 0) path.moveTo(x, y);
+          else path.lineTo(x, y);
         }
-        ctx.stroke();
+
+        // Três passadas: halo largo, brilho médio e núcleo fino = efeito neon.
+        ctx.strokeStyle = `rgba(${COLOR}, ${(0.05 * strength).toFixed(3)})`;
+        ctx.lineWidth = 14;
+        ctx.stroke(path);
+        ctx.strokeStyle = `rgba(${COLOR}, ${(0.12 * strength).toFixed(3)})`;
+        ctx.lineWidth = 5;
+        ctx.stroke(path);
+        ctx.strokeStyle = `rgba(255, 236, 150, ${(0.55 * strength).toFixed(3)})`;
+        ctx.lineWidth = 1.1;
+        ctx.stroke(path);
       }
     };
 
