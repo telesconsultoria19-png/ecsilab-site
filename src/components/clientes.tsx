@@ -1,3 +1,5 @@
+import { UserRound } from "lucide-react";
+
 import { GlowCard, Section, SectionHead } from "@/components/ui-bits";
 import { CLIENTES, type Cliente } from "@/lib/clientes";
 
@@ -23,51 +25,54 @@ function Completo({ c }: { c: Cliente }) {
       </header>
 
       <div className="grid gap-6 md:grid-cols-2 md:gap-10">
-        {/* Esquerda: depoimento com foto (ou, sem depoimento, as entregas) */}
-        <GlowCard reveal={false} className="flex flex-col p-7 sm:p-9">
-          {d ? (
-            <>
-              <blockquote className="text-xl leading-relaxed text-paper sm:text-2xl">
+        {/* Esquerda: espaço reservado para a foto e o depoimento do empresário */}
+        <GlowCard reveal={false} className="flex flex-col p-5 sm:p-6">
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl">
+            {d?.foto ? (
+              <img
+                src={d.foto}
+                alt={d.autor}
+                loading="lazy"
+                className="h-full w-full object-cover object-[50%_20%]"
+              />
+            ) : (
+              <div
+                role="img"
+                aria-label={`Foto do empresário da ${c.nome} em breve`}
+                className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[#0f0f0f] text-paper/40"
+              >
+                <UserRound size={56} strokeWidth={1.25} />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em]">
+                  Foto do empresário
+                </span>
+              </div>
+            )}
+          </div>
+
+          <blockquote className="mt-6 min-h-[7rem] text-xl leading-relaxed sm:text-2xl">
+            {d ? (
+              <>
                 <span aria-hidden="true" className="mr-1 text-4xl leading-none text-accent">“</span>
-                {d.texto}
-              </blockquote>
-              <footer className="mt-8 flex items-center gap-4">
-                {d.foto ? (
-                  <img
-                    src={d.foto}
-                    alt={d.autor}
-                    loading="lazy"
-                    className="h-16 w-16 rounded-full object-cover shadow-[0_0_30px_-8px_rgba(253,202,10,0.6)]"
-                  />
-                ) : (
-                  <span
-                    aria-hidden="true"
-                    className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/15 text-xl font-bold text-accent"
-                  >
-                    {iniciais(d.autor)}
-                  </span>
-                )}
-                <div>
-                  <p className="font-semibold">{d.autor}</p>
-                  {d.cargo && <p className="text-sm text-paper/60">{d.cargo}</p>}
-                </div>
-              </footer>
-            </>
-          ) : (
-            <>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-paper/60">
-                O que entregamos
-              </p>
-              <ul className="mt-5 space-y-3 text-paper/90">
-                {(c.entregas ?? []).map((e) => (
-                  <li key={e} className="flex gap-3">
-                    <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                    {e}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
+                <span className="text-paper">{d.texto}</span>
+              </>
+            ) : (
+              <span className="italic text-paper/35">O depoimento do empresário entra aqui.</span>
+            )}
+          </blockquote>
+
+          <footer className="mt-4">
+            {d ? (
+              <>
+                <p className="font-semibold">{d.autor}</p>
+                {d.cargo && <p className="text-sm text-paper/60">{d.cargo}</p>}
+              </>
+            ) : (
+              <>
+                <p className="font-semibold text-paper/35">Nome do empresário</p>
+                <p className="text-sm text-paper/30">Cargo, {c.nome}</p>
+              </>
+            )}
+          </footer>
         </GlowCard>
 
         {/* Direita: a história do que foi construído */}
@@ -76,11 +81,15 @@ function Completo({ c }: { c: Cliente }) {
             O que construímos
           </p>
           <div className="space-y-4 text-lg leading-relaxed text-paper/80">
-            {(c.historia ?? []).map((p) => (
-              <p key={p}>{p}</p>
-            ))}
+            {c.historia ? (
+              c.historia.map((p) => <p key={p}>{p}</p>)
+            ) : (
+              <p className="italic text-paper/35">
+                A história do que construímos para a {c.nome} entra aqui.
+              </p>
+            )}
           </div>
-          {d && c.entregas && (
+          {c.entregas && (
             <ul className="mt-6 space-y-2 text-sm text-paper/85">
               {c.entregas.map((e) => (
                 <li key={e} className="flex gap-3">
@@ -105,9 +114,6 @@ function Completo({ c }: { c: Cliente }) {
 }
 
 export function Clientes() {
-  const completos = CLIENTES.filter((c) => c.historia || c.depoimento);
-  const demais = CLIENTES.filter((c) => !c.historia && !c.depoimento);
-
   return (
     <Section id="clientes">
       <SectionHead
@@ -117,32 +123,10 @@ export function Clientes() {
       />
 
       <div className="space-y-20 md:space-y-28">
-        {completos.map((c) => (
+        {CLIENTES.map((c) => (
           <Completo key={c.nome} c={c} />
         ))}
       </div>
-
-      {demais.length > 0 && (
-        <div className="reveal mt-20 md:mt-28">
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.25em] text-paper/60">
-            Também construímos com
-          </p>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {demais.map((c) => (
-              <li key={c.nome}>
-                <GlowCard reveal={false} className="p-6">
-                  {c.segmento && (
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-                      {c.segmento}
-                    </p>
-                  )}
-                  <p className={`${c.segmento ? "mt-2" : ""} text-2xl font-extrabold`}>{c.nome}</p>
-                </GlowCard>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </Section>
   );
 }

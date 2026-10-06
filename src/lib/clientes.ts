@@ -19,7 +19,7 @@ export type Cliente = {
   detalhe?: { href: string; rotulo: string };
 };
 
-// Quem tem `historia` ou `depoimento` aparece como linha completa; os demais, em destaque compacto.
+// Cada empresa tem espaço reservado para foto e depoimento (esquerda) e história (direita).
 export const CLIENTES: Cliente[] = [
   {
     nome: "Gestão 360",
