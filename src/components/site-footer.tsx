@@ -1,3 +1,5 @@
+import { Mascote } from "@/components/animated-icons";
+
 export function SiteFooter() {
   return (
     <footer>
@@ -6,9 +8,12 @@ export function SiteFooter() {
           <img src="/logo-ecsilab.png" alt="ecsilab" className="h-7 w-auto" />
           <p className="mt-3 text-sm text-paper/60">Growth, processos e escala comercial.</p>
         </div>
-        <p className="text-sm text-paper/50">
-          © {new Date().getFullYear()} ecsilab. Todos os direitos reservados.
-        </p>
+        <div className="flex items-center gap-5">
+          <p className="text-sm text-paper/50">
+            © {new Date().getFullYear()} ecsilab. Todos os direitos reservados.
+          </p>
+          <Mascote className="h-16 w-16 shrink-0" />
+        </div>
       </div>
     </footer>
   );

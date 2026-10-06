@@ -1,5 +1,6 @@
 import { UserRound } from "lucide-react";
 
+import { AspasAnimadas } from "@/components/animated-icons";
 import { GlowCard, Section, SectionHead } from "@/components/ui-bits";
 import { CLIENTES, type Cliente } from "@/lib/clientes";
 
@@ -50,9 +51,9 @@ function Completo({ c }: { c: Cliente }) {
           </div>
 
           <blockquote className="mt-6 min-h-[7rem] text-xl leading-relaxed sm:text-2xl">
+            <AspasAnimadas className="mb-3 h-9 w-9" />
             {d ? (
               <>
-                <span aria-hidden="true" className="mr-1 text-4xl leading-none text-accent">“</span>
                 <span className="text-paper">{d.texto}</span>
               </>
             ) : (

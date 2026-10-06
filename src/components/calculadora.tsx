@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { Medidor } from "@/components/animated-icons";
 import { GlowCard, Section, SectionHead } from "@/components/ui-bits";
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
@@ -120,7 +121,8 @@ export function Calculadora() {
         </GlowCard>
 
         <GlowCard className="flex flex-col p-6 sm:p-8">
-          <dl className="grid grid-cols-2 gap-4">
+          <Medidor ratio={ratio} zona={ratio < 1 ? 0 : ratio < 3 ? 1 : 2} />
+          <dl className="mt-4 grid grid-cols-2 gap-4">
             <div>
               <dt className="text-sm text-paper/60">LTV anual</dt>
               <dd className="text-3xl font-extrabold">{brl(ltv)}</dd>

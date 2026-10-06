@@ -34,7 +34,7 @@ export function Section({
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
     <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
-      <span className="h-px w-8 bg-gradient-to-r from-transparent to-accent shadow-[0_0_10px_#fdca0a]" />
+      <span className="eyebrow-line h-px w-8 bg-gradient-to-r from-transparent to-accent shadow-[0_0_10px_#fdca0a]" />
       {children}
     </p>
   );

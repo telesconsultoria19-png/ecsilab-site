@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { Funil } from "@/components/animated-icons";
 import { GlowCard, Section, SectionHead, PrimaryButton, inputCls } from "@/components/ui-bits";
 import { submitLead } from "@/lib/leads";
 
@@ -182,8 +183,13 @@ export function Diagnostico() {
             <span className="inline-block rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent">
               Restrição crítica detectada
             </span>
-            <h3 className="mt-5 text-3xl font-extrabold">{RESULTADOS[resultado].titulo}</h3>
-            <p className="mt-4 text-lg leading-relaxed text-paper/80">{RESULTADOS[resultado].texto}</p>
+            <div className="mt-6 grid items-center gap-8 sm:grid-cols-[1fr_auto]">
+              <div>
+                <h3 className="text-3xl font-extrabold">{RESULTADOS[resultado].titulo}</h3>
+                <p className="mt-4 text-lg leading-relaxed text-paper/80">{RESULTADOS[resultado].texto}</p>
+              </div>
+              <Funil ativa={resultado} />
+            </div>
 
             <div className="mt-8 rounded-xl bg-white/[0.05] p-5">
               <p className="font-semibold text-accent">Solução recomendada pela ecsilab</p>

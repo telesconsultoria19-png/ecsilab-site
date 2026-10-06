@@ -1,3 +1,4 @@
+import { Fio } from "@/components/animated-icons";
 import { CountUp, Section, SectionHead } from "@/components/ui-bits";
 
 const SOCIOS = [
@@ -73,6 +74,7 @@ export function Socios() {
             <div className="flex flex-col">
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">{s.cargo}</p>
               <h3 className="mt-3 text-4xl font-extrabold sm:text-5xl">{s.nome}</h3>
+              <Fio />
               <p className="mt-3 text-lg font-medium text-accent">{s.territorio}</p>
               <p className="mt-6 text-lg leading-relaxed text-paper/75">{s.resumo}</p>
 

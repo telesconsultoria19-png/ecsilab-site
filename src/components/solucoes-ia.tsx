@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { CheckAnimado, NosConectados } from "@/components/animated-icons";
 import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
 import { submitLead } from "@/lib/leads";
 import { CATEGORIAS, SOLUCOES, type Solucao } from "@/lib/solucoes";
@@ -45,9 +46,12 @@ function Interesse({ solucao, onClose }: { solucao: Solucao; onClose: () => void
 
         {estado === "ok" ? (
           <>
-            <p className="mt-6 text-paper/80">
-              Recebemos o seu interesse. Nossa equipe entrará em contato para entender o seu cenário.
-            </p>
+            <div className="mt-6 flex items-center gap-4">
+              <CheckAnimado className="h-12 w-12 shrink-0" />
+              <p className="text-paper/80">
+                Recebemos o seu interesse. Nossa equipe entrará em contato para entender o seu cenário.
+              </p>
+            </div>
             <button onClick={onClose} className="mt-6 text-accent hover:underline">
               Fechar
             </button>
@@ -128,7 +132,8 @@ export function SolucoesIA() {
         className="mt-8 grid animate-[tab-in_0.45s_ease] gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
         {lista.map((s) => (
-          <GlowCard as="article" reveal={false} key={s.slug} className="flex flex-col p-6">
+          <GlowCard as="article" reveal={false} key={s.slug} className="group flex flex-col p-6">
+            <NosConectados className="pointer-events-none absolute right-5 top-5 h-10 w-16" />
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{s.tipo}</p>
             <h4 className="mt-2 text-2xl font-extrabold">{s.nome}</h4>
             <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{s.descricao}</p>

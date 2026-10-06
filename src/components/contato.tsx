@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { CheckAnimado } from "@/components/animated-icons";
 import { EnergyFlow } from "@/components/energy-flow";
 import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
 import { FAIXAS_FATURAMENTO, submitLead } from "@/lib/leads";
@@ -45,6 +46,7 @@ export function Contato() {
       <GlowCard className="max-w-2xl p-6 sm:p-10">
         {estado === "ok" ? (
           <div>
+            <CheckAnimado className="mb-5 h-16 w-16" />
             <h3 className="text-2xl font-bold text-accent">Recebemos o seu pedido</h3>
             <p className="mt-3 text-paper/80">
               Entraremos em contato pelo WhatsApp para alinhar o melhor horário.
