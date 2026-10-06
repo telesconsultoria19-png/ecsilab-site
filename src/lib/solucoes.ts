@@ -22,7 +22,7 @@ export const SOLUCOES: Solucao[] = [
   // Comercial
   {
     slug: "sdr-whatsapp-ia",
-    nome: "Sonda",
+    nome: "Lexia",
     tipo: "SDR com IA no WhatsApp",
     categoria: "Comercial",
     descricao:
@@ -30,21 +30,21 @@ export const SOLUCOES: Solucao[] = [
   },
   {
     slug: "lexia-talks",
-    nome: "Lexia",
+    nome: "Lexia Voice",
     tipo: "SDR por voz",
     categoria: "Comercial",
     descricao: "SDR com IA que conversa por voz para abordar e qualificar leads.",
   },
   {
     slug: "flow-crm",
-    nome: "Órbita",
+    nome: "Redil",
     tipo: "CRM",
     categoria: "Comercial",
     descricao: "CRM para organizar contatos, funil e o acompanhamento de cada negociação.",
   },
   {
     slug: "cso-autonomo",
-    nome: "Vértice",
+    nome: "Alfredo",
     tipo: "Diretor comercial autônomo",
     categoria: "Comercial",
     descricao: "Agente de IA que apoia a estratégia e a rotina comercial da empresa.",
