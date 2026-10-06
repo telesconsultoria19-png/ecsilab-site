@@ -133,7 +133,7 @@ export function SolucoesIA() {
       >
         {lista.map((s) => (
           <GlowCard as="article" reveal={false} key={s.slug} className="group flex flex-col p-6">
-            <NosConectados className="pointer-events-none absolute right-5 top-5 h-10 w-16" />
+            <NosConectados className="pointer-events-none absolute bottom-5 right-5 h-10 w-16" />
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{s.tipo}</p>
             <h4 className="mt-2 text-2xl font-extrabold">{s.nome}</h4>
             <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{s.descricao}</p>
