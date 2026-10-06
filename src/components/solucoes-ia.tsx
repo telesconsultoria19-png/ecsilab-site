@@ -41,6 +41,7 @@ function Interesse({ solucao, onClose }: { solucao: Solucao; onClose: () => void
       >
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Quero esta solução</p>
         <h3 className="mt-2 text-2xl font-bold">{solucao.nome}</h3>
+        <p className="text-sm text-paper/60">{solucao.tipo}</p>
 
         {estado === "ok" ? (
           <>
@@ -128,7 +129,8 @@ export function SolucoesIA() {
       >
         {lista.map((s) => (
           <GlowCard as="article" reveal={false} key={s.slug} className="flex flex-col p-6">
-            <h4 className="text-lg font-bold">{s.nome}</h4>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{s.tipo}</p>
+            <h4 className="mt-2 text-2xl font-extrabold">{s.nome}</h4>
             <p className="mt-3 flex-1 text-sm leading-relaxed text-paper/70">{s.descricao}</p>
             <button
               type="button"
