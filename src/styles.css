@@ -131,17 +131,17 @@ section[id] {
   to { opacity: 1; transform: none; }
 }
 
-/* Ênfase: a luz do número respira, mais forte e mais fraca */
+/* Ênfase: a luz do número acende forte uma única vez e volta ao brilho normal */
 @keyframes glow-pulse {
   0%, 100% {
-    filter: drop-shadow(0 0 18px rgba(253, 202, 10, 0.3)) brightness(1);
+    filter: drop-shadow(0 0 40px rgba(253, 202, 10, 0.45)) drop-shadow(0 0 0 rgba(255, 238, 160, 0)) brightness(1);
   }
-  50% {
-    filter: drop-shadow(0 0 80px rgba(253, 202, 10, 0.95)) drop-shadow(0 0 26px rgba(255, 238, 160, 0.85)) brightness(1.2);
+  45% {
+    filter: drop-shadow(0 0 90px rgba(253, 202, 10, 1)) drop-shadow(0 0 30px rgba(255, 238, 160, 0.9)) brightness(1.25);
   }
 }
 .glow-pulse {
-  animation: glow-pulse 2.4s ease-in-out infinite;
+  animation: glow-pulse 1.8s ease-in-out 1;
 }
 @media (prefers-reduced-motion: reduce) {
   .glow-pulse { animation: none; }
