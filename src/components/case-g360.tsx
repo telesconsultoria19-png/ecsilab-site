@@ -47,7 +47,7 @@ export function CaseG360() {
             className="text-[5.5rem] font-extrabold leading-none tracking-tight text-accent drop-shadow-[0_0_40px_rgba(253,202,10,0.45)] sm:text-[9rem] lg:text-[13rem]"
             aria-label="37,1 vezes"
           >
-            <CountUp value={37.1} decimals={1} suffix="x" />
+            <CountUp value={37.1} decimals={1} suffix="x" duration={3000} />
           </p>
           <h2 className="mx-auto mt-4 max-w-2xl text-2xl font-bold sm:text-4xl">
             de retorno sobre cada real investido em mídia paga

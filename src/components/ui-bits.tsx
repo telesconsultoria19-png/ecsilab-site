@@ -92,11 +92,14 @@ export function CountUp({
   decimals = 0,
   prefix = "",
   suffix = "",
+  duration = 1600,
 }: {
   value: number;
   decimals?: number;
   prefix?: string;
   suffix?: string;
+  /** Duração total em milissegundos. Começa rápido e desacelera até o valor final. */
+  duration?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [n, setN] = useState(value);
@@ -111,10 +114,10 @@ export function CountUp({
         if (!entry?.isIntersecting) return;
         io.disconnect();
         const t0 = performance.now();
-        const dur = 1600;
+        const dur = duration;
         const tick = (now: number) => {
           const p = Math.min((now - t0) / dur, 1);
-          setN(value * (1 - Math.pow(1 - p, 3)));
+          setN(value * (1 - Math.pow(1 - p, 2)));
           if (p < 1) raf = requestAnimationFrame(tick);
         };
         raf = requestAnimationFrame(tick);
@@ -126,7 +129,7 @@ export function CountUp({
       io.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [value]);
+  }, [value, duration]);
 
   return (
     <span ref={ref}>
