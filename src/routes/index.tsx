@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { Clientes } from "@/components/clientes";
 import { Calculadora } from "@/components/calculadora";
 import { CaseG360 } from "@/components/case-g360";
 import { Contato } from "@/components/contato";
@@ -26,6 +27,7 @@ function Home() {
         <Diagnostico />
         <Calculadora />
         <CaseG360 />
+        <Clientes />
         <SolucoesIA />
         <Contato />
       </main>

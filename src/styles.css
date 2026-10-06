@@ -130,3 +130,19 @@ section[id] {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: none; }
 }
+
+/* Ênfase: a luz do número respira, mais forte e mais fraca */
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 18px rgba(253, 202, 10, 0.3)) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 80px rgba(253, 202, 10, 0.95)) drop-shadow(0 0 26px rgba(255, 238, 160, 0.85)) brightness(1.2);
+  }
+}
+.glow-pulse {
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow-pulse { animation: none; }
+}

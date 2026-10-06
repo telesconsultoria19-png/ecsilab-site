@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { CountUp, Eyebrow, GlowCard, Section } from "@/components/ui-bits";
 
 type Item = { v: number; d?: number; prefix?: string; suffix?: string; l: string };
@@ -32,6 +34,8 @@ function Grid({ itens }: { itens: Item[] }) {
 }
 
 export function CaseG360() {
+  const [pronto, setPronto] = useState(false);
+
   return (
     <>
       <section id="case" className="relative overflow-hidden">
@@ -44,10 +48,12 @@ export function CaseG360() {
             <Eyebrow>Prova em campo · case G360</Eyebrow>
           </div>
           <p
-            className="text-[5.5rem] font-extrabold leading-none tracking-tight text-accent drop-shadow-[0_0_40px_rgba(253,202,10,0.45)] sm:text-[9rem] lg:text-[13rem]"
+            className={`text-[5.5rem] font-extrabold leading-none tracking-tight text-accent drop-shadow-[0_0_40px_rgba(253,202,10,0.45)] sm:text-[9rem] lg:text-[13rem] ${
+              pronto ? "glow-pulse" : ""
+            }`}
             aria-label="37,1 vezes"
           >
-            <CountUp value={37.1} decimals={1} suffix="x" duration={3000} />
+            <CountUp value={37.1} decimals={1} suffix="x" duration={3000} onDone={() => setPronto(true)} />
           </p>
           <h2 className="mx-auto mt-4 max-w-2xl text-2xl font-bold sm:text-4xl">
             de retorno sobre cada real investido em mídia paga

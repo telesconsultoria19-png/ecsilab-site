@@ -93,6 +93,7 @@ export function CountUp({
   prefix = "",
   suffix = "",
   duration = 1600,
+  onDone,
 }: {
   value: number;
   decimals?: number;
@@ -100,9 +101,13 @@ export function CountUp({
   suffix?: string;
   /** Duração total em milissegundos. Começa rápido e desacelera até o valor final. */
   duration?: number;
+  /** Chamado uma vez, quando o número termina de subir. */
+  onDone?: () => void;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [n, setN] = useState(value);
+  const doneRef = useRef(onDone);
+  doneRef.current = onDone;
 
   useEffect(() => {
     const el = ref.current;
@@ -119,6 +124,7 @@ export function CountUp({
           const p = Math.min((now - t0) / dur, 1);
           setN(value * (1 - Math.pow(1 - p, 2)));
           if (p < 1) raf = requestAnimationFrame(tick);
+          else doneRef.current?.();
         };
         raf = requestAnimationFrame(tick);
       },

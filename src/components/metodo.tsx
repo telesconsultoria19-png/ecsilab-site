@@ -42,7 +42,7 @@ export function Metodo() {
     <>
       <section id="gargalos" className="relative overflow-hidden">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex min-h-[85vh] flex-col justify-center py-24">
+          <div className="pt-24 sm:pt-32">
             <Eyebrow>A dura realidade do mercado</Eyebrow>
             <ScrollWords
               text="O marketing tradicional virou moda. E moda não paga conta."
@@ -51,7 +51,7 @@ export function Metodo() {
             />
           </div>
 
-          <div className="reveal grid gap-8 pb-24 text-lg leading-relaxed text-paper/75 lg:grid-cols-2 lg:gap-16">
+          <div className="reveal mt-10 grid gap-8 pb-24 text-lg sm:mt-14 leading-relaxed text-paper/75 lg:grid-cols-2 lg:gap-16">
             <div className="space-y-5">
               <p>
                 Enquanto muita agência vende relatório de curtida e template de story, nós focamos no
