@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PoliticaDePrivacidadeRouteImport } from './routes/politica-de-privacidade'
 import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
+import { Route as ApiNovoLeadRouteImport } from './routes/api.novo-lead'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,50 @@ const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
   path: '/termos-de-uso',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiNovoLeadRoute = ApiNovoLeadRouteImport.update({
+  id: '/api/novo-lead',
+  path: '/api/novo-lead',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
+  '/api/novo-lead': typeof ApiNovoLeadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
+  '/api/novo-lead': typeof ApiNovoLeadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
+  '/api/novo-lead': typeof ApiNovoLeadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/politica-de-privacidade' | '/termos-de-uso'
+  fullPaths:
+    '/' | '/politica-de-privacidade' | '/termos-de-uso' | '/api/novo-lead'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/politica-de-privacidade' | '/termos-de-uso'
-  id: '__root__' | '/' | '/politica-de-privacidade' | '/termos-de-uso'
+  to: '/' | '/politica-de-privacidade' | '/termos-de-uso' | '/api/novo-lead'
+  id:
+    | '__root__'
+    | '/'
+    | '/politica-de-privacidade'
+    | '/termos-de-uso'
+    | '/api/novo-lead'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PoliticaDePrivacidadeRoute: typeof PoliticaDePrivacidadeRoute
   TermosDeUsoRoute: typeof TermosDeUsoRoute
+  ApiNovoLeadRoute: typeof ApiNovoLeadRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +98,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermosDeUsoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/novo-lead': {
+      id: '/api/novo-lead'
+      path: '/api/novo-lead'
+      fullPath: '/api/novo-lead'
+      preLoaderRoute: typeof ApiNovoLeadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +112,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PoliticaDePrivacidadeRoute: PoliticaDePrivacidadeRoute,
   TermosDeUsoRoute: TermosDeUsoRoute,
+  ApiNovoLeadRoute: ApiNovoLeadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
