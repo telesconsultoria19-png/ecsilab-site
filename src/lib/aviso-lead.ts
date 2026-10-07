@@ -173,8 +173,16 @@ export async function tratarAviso(
   });
 
   if (!resp.ok) {
-    console.error(`[aviso-lead] o Resend recusou o envio (status ${resp.status})`);
-    return { status: 502, corpo: { erro: "falha ao enviar o e-mail" } };
+    // O Resend explica o motivo (chave inválida, destinatário não permitido etc.). Não contém segredos.
+    let detalhe = "";
+    try {
+      const j = (await resp.json()) as { message?: unknown; name?: unknown };
+      detalhe = [j.name, j.message].filter((x) => typeof x === "string").join(": ").slice(0, 300);
+    } catch {
+      /* resposta sem corpo legível */
+    }
+    console.error(`[aviso-lead] o Resend recusou o envio (status ${resp.status}) ${detalhe}`);
+    return { status: 502, corpo: { erro: "falha ao enviar o e-mail", statusResend: resp.status, detalhe } };
   }
   return { status: 200, corpo: { ok: true } };
 }
