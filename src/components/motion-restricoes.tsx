@@ -19,9 +19,19 @@ import { useEffect, useRef, useState } from "react";
  */
 
 // ---------- geometria (unidades de projeto; o tubo tem 1920 de comprimento) ----------
-const L = 1920;
+// No computador o tubo é largo e comprido; no celular (vertical) ele é mais curto, para a história caber numa tela só.
+const L_HORIZONTAL = 1920;
+const L_VERTICAL = 1180;
+let L = L_HORIZONTAL;
 const NZ = 6;
-const ZL = L / NZ;
+let ZL = L / NZ;
+const definirGeometria = (vertical: boolean) => {
+  L = vertical ? L_VERTICAL : L_HORIZONTAL;
+  ZL = L / NZ;
+};
+// Espaço reservado no palco vertical: legenda em cima e contador embaixo.
+const TOPO_V = 92;
+const BASE_V = 176;
 const BASE = [220, 200, 240, 60, 236, 300];
 const R = 7; // raio da bolinha
 const DD = R * 2 * 1.55; // diâmetro com folga (bolinhas respiram, mesmo na fila cheia)
@@ -140,6 +150,19 @@ function criarSim() {
       s.saida = 0;
       s.saidas.length = 0;
     },
+    /** Recomeça do zero (usado quando o aparelho troca de orientação e o tubo muda de comprimento). */
+    reiniciar() {
+      s.t = 0;
+      s.w = [...BASE];
+      s.bolas = [];
+      s.acc = 0;
+      s.saida = 0;
+      s.saidas.length = 0;
+      s.relogio = 0;
+      for (let k = 0; k < 16 * 60; k++) passo(1 / 60, false);
+      s.saida = 0;
+      s.saidas.length = 0;
+    },
     vazao: () => s.saidas.length / 2,
     /** Velocidade que o sistema suporta: a capacidade da zona mais estreita (a restrição). */
     capacidade: () => Math.min(...s.w.map((w) => (V * w) / (DD * DD))),
@@ -184,6 +207,7 @@ export function MotionRestricoes() {
     let ch = 0;
     let dpr = 1;
     let vertical = false;
+    let geometriaVertical = false;
     let sc = 1;
     let raf = 0;
     let rodando = false;
@@ -230,20 +254,43 @@ export function MotionRestricoes() {
       );
     };
 
+    /** Altura da tela "pequena" do aparelho (com a barra do navegador visível), para o palco caber inteiro. */
+    const alturaDaTela = () => {
+      const m = document.createElement("div");
+      m.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;width:0;height:100svh";
+      document.body.appendChild(m);
+      const h = m.getBoundingClientRect().height;
+      m.remove();
+      return h > 100 ? h : window.innerHeight;
+    };
+
     const dimensionar = () => {
       cw = raiz.clientWidth;
-      vertical = cw < 640;
-      ch = vertical ? Math.round(130 + L * 0.4 + 180) : Math.round(Math.min(800, Math.max(400, cw * 0.5)));
+      const vert = cw < 640;
+      if (vert !== geometriaVertical) {
+        geometriaVertical = vert;
+        definirGeometria(vert);
+        sim.reiniciar();
+        zrAnterior = -1;
+      }
+      vertical = vert;
+      if (vertical) {
+        // uma tela mostra a ideia toda: legenda, tubo inteiro e contador, abaixo do cabeçalho fixo
+        ch = Math.round(Math.min(720, Math.max(540, alturaDaTela() - 76)));
+        sc = (ch - TOPO_V - BASE_V) / L;
+      } else {
+        ch = Math.round(Math.min(800, Math.max(400, cw * 0.5)));
+        sc = cw / (L + 160);
+      }
       raiz.style.height = `${ch}px`;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(cw * dpr);
       canvas.height = Math.round(ch * dpr);
-      sc = vertical ? 0.4 : cw / (L + 160);
     };
 
     // posição na tela de um ponto do tubo: u ao longo, v de lado
     const P = (u: number, v: number): [number, number] =>
-      vertical ? [cw * 0.46 + v * sc, 130 + u * sc] : [80 * sc + u * sc, ch * 0.54 + v * sc];
+      vertical ? [cw * 0.46 + v * sc, TOPO_V + u * sc] : [80 * sc + u * sc, ch * 0.54 + v * sc];
 
     const desenhar = () => {
       const { s } = sim;
@@ -579,7 +626,11 @@ export function MotionRestricoes() {
         </div>
 
         {/* o destaque é a vazão (bolinhas por segundo); o total acumulado fica em segundo plano */}
-        <div ref={hudRef} aria-hidden="true" className="pointer-events-none absolute bottom-[3%] right-[17%] text-right">
+        <div
+          ref={hudRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-[3%] left-[46%] -translate-x-1/2 text-center sm:left-auto sm:right-[17%] sm:translate-x-0 sm:text-right"
+        >
           <div className="relative inline-block">
             {/* aparece só quando uma nova velocidade é conquistada, ao lado do número */}
             <div className="absolute right-full top-0 mr-[clamp(10px,1.4vw,22px)] flex h-full items-center">
@@ -593,7 +644,7 @@ export function MotionRestricoes() {
             </div>
             <p
               ref={numeroRef}
-              className="origin-right text-[clamp(38px,5.2vw,78px)] font-extrabold leading-none text-accent drop-shadow-[0_0_22px_rgba(253,202,10,0.5)]"
+              className="origin-center text-[clamp(38px,5.2vw,78px)] font-extrabold leading-none text-accent drop-shadow-[0_0_22px_rgba(253,202,10,0.5)] sm:origin-right"
             >
               <span ref={vazaoRef}>0</span>
             </p>
