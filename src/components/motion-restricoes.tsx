@@ -182,7 +182,7 @@ export function MotionRestricoes() {
     const dimensionar = () => {
       cw = raiz.clientWidth;
       vertical = cw < 640;
-      ch = vertical ? Math.round(((L + 160) * 0.4) + 150) : Math.round(Math.min(620, Math.max(360, cw * 0.44)));
+      ch = vertical ? Math.round(130 + L * 0.4 + 130) : Math.round(Math.min(640, Math.max(380, cw * 0.46)));
       raiz.style.height = `${ch}px`;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(cw * dpr);
@@ -192,7 +192,7 @@ export function MotionRestricoes() {
 
     // posição na tela de um ponto do tubo: u ao longo, v de lado
     const P = (u: number, v: number): [number, number] =>
-      vertical ? [cw * 0.46 + v * sc, 70 + u * sc] : [80 * sc + u * sc, ch * 0.55 + v * sc];
+      vertical ? [cw * 0.46 + v * sc, 130 + u * sc] : [80 * sc + u * sc, ch * 0.585 + v * sc];
 
     const desenhar = () => {
       const { s } = sim;
@@ -332,10 +332,10 @@ export function MotionRestricoes() {
         const uc = (3.5 - 2 * viagem) * ZL;
         const flutua = Math.sin(s.relogio * 2.4) * 6;
         const w = largura(uc, s.w);
-        const [mx, my] = vertical ? P(uc, w / 2 + 120 + flutua) : P(uc, -w / 2 - 128 + flutua);
+        const [mx, my] = vertical ? P(uc, -w / 2 - 120 + flutua) : P(uc, -w / 2 - 128 + flutua);
         const tam = Math.max(34, 74 * sc * (vertical ? 1.5 : 1.05));
         // facho de luz até a parede
-        const [wx, wy] = vertical ? P(uc, w / 2) : P(uc, -w / 2);
+        const [wx, wy] = P(uc, -w / 2);
         const g = ctx.createLinearGradient(mx, my, wx, wy);
         g.addColorStop(0, `rgba(${AMARELO},${0.5 * apareceC})`);
         g.addColorStop(1, `rgba(${AMARELO},0)`);
@@ -343,9 +343,10 @@ export function MotionRestricoes() {
         ctx.beginPath();
         const aberto = 56 * sc;
         if (vertical) {
-          ctx.moveTo(mx, my - tam * 0.2);
-          ctx.lineTo(wx - aberto, wy);
-          ctx.lineTo(wx + aberto, wy);
+          // marcador à esquerda do tubo: o facho abre no sentido vertical
+          ctx.moveTo(mx + tam * 0.4, my);
+          ctx.lineTo(wx, wy - aberto);
+          ctx.lineTo(wx, wy + aberto);
         } else {
           ctx.moveTo(mx - tam * 0.2, my + tam * 0.4);
           ctx.lineTo(wx - aberto, wy);
@@ -468,7 +469,7 @@ export function MotionRestricoes() {
     >
       <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
 
-      <div ref={hudRef} aria-hidden="true" className="pointer-events-none absolute right-[5%] top-[5%] text-right">
+      <div ref={hudRef} aria-hidden="true" className="pointer-events-none absolute bottom-[4%] right-[12%] text-right">
         <p className="text-[clamp(10px,1vw,14px)] font-semibold uppercase tracking-[0.25em] text-paper/50">Saída</p>
         <p className="text-[clamp(26px,3.4vw,52px)] font-extrabold leading-none text-accent drop-shadow-[0_0_18px_rgba(253,202,10,0.45)]">
           <span ref={saidaRef}>0</span>
@@ -478,8 +479,8 @@ export function MotionRestricoes() {
         </p>
       </div>
 
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-[3%] px-6 text-center">
-        <div className="relative mx-auto h-[2.6em] max-w-3xl text-[clamp(14px,1.6vw,24px)]">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[2.5%] px-6 text-center">
+        <div className="relative mx-auto h-[3.1em] max-w-3xl text-[clamp(14px,1.6vw,24px)] leading-tight">
           {LEGENDAS.map((l, i) => (
             <p
               key={i}
