@@ -11,6 +11,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SolucoesIA } from "@/components/solucoes-ia";
 import { Socios } from "@/components/socios";
+import { SECOES_VISIVEIS } from "@/lib/secoes";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -27,7 +28,7 @@ function Home() {
         <Diagnostico />
         <Calculadora />
         <CaseG360 />
-        <Clientes />
+        {SECOES_VISIVEIS.clientes && <Clientes />}
         <SolucoesIA />
         <Contato />
       </main>
