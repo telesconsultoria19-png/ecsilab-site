@@ -4,6 +4,7 @@ import { AceitePrivacidade } from "@/components/aceite-privacidade";
 import { CheckAnimado, NosConectados } from "@/components/animated-icons";
 import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
 import { submitLead } from "@/lib/leads";
+import { SERVICOS, TOTAL_SERVICOS } from "@/lib/servicos";
 import { CATEGORIAS, SOLUCOES, type Solucao } from "@/lib/solucoes";
 
 function Interesse({ solucao, onClose }: { solucao: Solucao; onClose: () => void }) {
@@ -92,18 +93,70 @@ function Interesse({ solucao, onClose }: { solucao: Solucao; onClose: () => void
   );
 }
 
+function BlocoTitulo({ rotulo, contagem, texto }: { rotulo: string; contagem: string; texto: string }) {
+  return (
+    <header className="reveal max-w-3xl">
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h3 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{rotulo}</h3>
+        <span className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">{contagem}</span>
+      </div>
+      <p className="mt-3 text-lg leading-relaxed text-paper/75">{texto}</p>
+    </header>
+  );
+}
+
 export function SolucoesIA() {
   const [aberta, setAberta] = useState<Solucao | null>(null);
   const [cat, setCat] = useState<(typeof CATEGORIAS)[number]>(CATEGORIAS[0]);
   const lista = SOLUCOES.filter((s) => s.categoria === cat);
 
   return (
-    <Section id="solucoes-ia">
+    <Section id="portfolio">
       <SectionHead
         eyebrow="Portfólio Écsilab"
-        title="Soluções de inteligência artificial para a sua operação"
-        lead="Soluções prontas que implantamos na sua empresa, uma a uma ou em pacotes, para ganhar velocidade em vendas, atendimento, finanças e gestão."
+        title="Serviços e soluções de inteligência artificial para a sua operação"
+        lead="Do planejamento de marca à implantação de IA: o que a Écsilab entrega, em serviços conduzidos por nós e em soluções prontas para implantar."
       />
+
+      {/* ---------- Serviços ---------- */}
+      <div id="servicos" className="scroll-mt-24">
+        <BlocoTitulo rotulo="Serviços" contagem={`${TOTAL_SERVICOS} serviços`} texto="O que a nossa equipe conduz com você, da marca ao comercial." />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {SERVICOS.map((g) => (
+            <GlowCard as="article" key={g.titulo} className="p-7">
+              <h4 className="text-lg font-bold text-accent">{g.titulo}</h4>
+              <ul className="mt-4 space-y-2.5 text-paper/90">
+                {g.itens.map((i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                    {i}
+                  </li>
+                ))}
+              </ul>
+            </GlowCard>
+          ))}
+        </div>
+        <p className="mt-8 text-paper/70">
+          Quer acelerar com inteligência artificial?{" "}
+          <a href="#solucoes-ia" className="font-semibold text-accent hover:underline">
+            Veja as {SOLUCOES.length} soluções de IA
+          </a>
+          , ou{" "}
+          <a href="#contato" className="font-semibold text-accent hover:underline">
+            fale com a gente sobre qualquer serviço
+          </a>
+          .
+        </p>
+      </div>
+
+      {/* ---------- Soluções de IA ---------- */}
+      <div id="solucoes-ia" className="mt-24 scroll-mt-24">
+        <BlocoTitulo
+          rotulo="Soluções de IA"
+          contagem={`${SOLUCOES.length} soluções`}
+          texto="Soluções prontas que implantamos na sua empresa, uma a uma ou em pacotes, para ganhar velocidade em vendas, atendimento, finanças e gestão."
+        />
+        <div className="mt-8" />
 
       <div role="tablist" aria-label="Categorias de soluções" className="reveal -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
         {CATEGORIAS.map((c) => {
@@ -157,6 +210,8 @@ export function SolucoesIA() {
         </a>
         .
       </p>
+
+      </div>
 
       {aberta && <Interesse solucao={aberta} onClose={() => setAberta(null)} />}
     </Section>

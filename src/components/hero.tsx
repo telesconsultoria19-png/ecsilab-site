@@ -1,5 +1,4 @@
 import { EnergyFlow } from "@/components/energy-flow";
-import { Marquee } from "@/components/marquee";
 
 export function Hero() {
   return (
@@ -41,7 +40,6 @@ export function Hero() {
           com método de engenharia estruturada e processos implacáveis.
         </blockquote>
       </div>
-      <Marquee />
     </section>
   );
 }

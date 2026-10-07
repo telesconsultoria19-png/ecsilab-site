@@ -4,10 +4,10 @@ import { Menu, X } from "lucide-react";
 const idDe = (href: string) => href.split("#")[1] ?? "";
 
 export const NAV = [
-  { href: "/#socios", label: "Sócios" },
+  { href: "/#time", label: "Time" },
   { href: "/#diagnostico", label: "Diagnóstico" },
   { href: "/#metodo", label: "Método" },
-  { href: "/#solucoes-ia", label: "Soluções de IA" },
+  { href: "/#portfolio", label: "Portfólio" },
   { href: "/#contato", label: "Contato" },
 ];
 
@@ -39,6 +39,7 @@ export function SiteHeader() {
       raf = 0;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       setProgresso(max > 0 ? Math.min(1, window.scrollY / max) : 0);
+      if (window.scrollY < 160) setAtiva(""); // no início da página, nenhum item fica destacado
     };
     const on = () => {
       if (!raf) raf = requestAnimationFrame(calc);

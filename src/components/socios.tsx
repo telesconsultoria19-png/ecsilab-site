@@ -6,7 +6,7 @@ const SOCIOS = [
     foto: "/marcelo-teles.jpg" as string | null,
     iniciais: "MT",
     nome: "Marcelo Teles",
-    cargo: "Co-founder e CEO",
+    cargo: "CEO",
     territorio: "Growth, marketing e processos, com a Teoria das Restrições",
     resumo:
       "Engenheiro de produção que aplica a Teoria das Restrições em estratégias de marketing e growth. Antes de acelerar qualquer canal, encontra o gargalo que realmente limita o faturamento.",
@@ -24,14 +24,14 @@ const SOCIOS = [
     foto: null as string | null,
     iniciais: "MS",
     nome: "Marcos Schneider",
-    cargo: "Co-founder e CPO · CEO do Grupo MS",
+    cargo: "COO",
     territorio: "Growth, marketing, finanças e modelagem de negócio",
     resumo:
-      "CEO do Grupo MS, traz a visão de quem constrói e escala empresas por dentro: como o crescimento se sustenta nos números, no caixa e no desenho do negócio.",
+      "Cuida da operação da Écsilab e do território de growth, marketing, finanças e modelagem de negócio: como o crescimento se sustenta nos números, no caixa e no desenho do negócio.",
     competencias: [
       "Finanças e saúde do caixa no crescimento",
       "Modelagem de negócio e de receita",
-      "Governança comercial de quem opera um grupo",
+      "Operação e governança do crescimento",
     ],
     numeros: [] as Array<{ v: number; prefix: string; suffix: string; d: number; l: string }>,
   },
@@ -39,10 +39,10 @@ const SOCIOS = [
 
 export function Socios() {
   return (
-    <Section id="socios">
+    <Section id="time">
       <SectionHead
         eyebrow="Quem comanda o laboratório"
-        title="Dois sócios, dois territórios, um objetivo: receita previsível"
+        title="Dois territórios, um objetivo: receita previsível"
         lead="A Écsilab junta duas formas complementares de enxergar o crescimento: a engenharia dos processos e a lógica dos números do negócio."
       />
 
