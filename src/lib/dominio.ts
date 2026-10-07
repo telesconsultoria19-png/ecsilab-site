@@ -14,3 +14,14 @@ export function redirecionarParaOficial(request: Request): Response | null {
   }
   return null;
 }
+
+/**
+ * O endereço técnico (workers.dev) mostra o mesmo conteúdo do site oficial.
+ * Pedimos aos buscadores que não o indexem, para só o ecsilab.com.br aparecer no Google.
+ */
+export function marcarNoindexEmEnderecoTecnico(request: Request, response: Response): Response {
+  if (!new URL(request.url).hostname.endsWith(".workers.dev")) return response;
+  const nova = new Response(response.body, response);
+  nova.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return nova;
+}

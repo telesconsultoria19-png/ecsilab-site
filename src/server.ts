@@ -1,7 +1,7 @@
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
-import { redirecionarParaOficial } from "./lib/dominio";
+import { marcarNoindexEmEnderecoTecnico, redirecionarParaOficial } from "./lib/dominio";
 import { renderErrorPage } from "./lib/error-page";
 
 type ServerEntry = {
@@ -53,7 +53,7 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return marcarNoindexEmEnderecoTecnico(request, await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {

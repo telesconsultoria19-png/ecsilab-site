@@ -1,0 +1,6 @@
+# Écsilab: o site é público e pode ser indexado. O aviso interno de leads não.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://ecsilab.com.br/sitemap.xml
