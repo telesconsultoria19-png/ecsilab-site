@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
+const idDe = (href: string) => href.split("#")[1] ?? "";
+
 export const NAV = [
-  { href: "#metodo", label: "Método" },
-  { href: "#socios", label: "Sócios" },
-  { href: "#diagnostico", label: "Diagnóstico" },
-  { href: "#solucoes-ia", label: "Soluções de IA" },
-  { href: "#contato", label: "Contato" },
+  { href: "/#metodo", label: "Método" },
+  { href: "/#socios", label: "Sócios" },
+  { href: "/#diagnostico", label: "Diagnóstico" },
+  { href: "/#solucoes-ia", label: "Soluções de IA" },
+  { href: "/#contato", label: "Contato" },
 ];
 
 export function SiteHeader() {
@@ -16,7 +18,7 @@ export function SiteHeader() {
 
   // Destaca no menu a seção que está na tela.
   useEffect(() => {
-    const ids = NAV.map((n) => n.href.slice(1));
+    const ids = NAV.map((n) => idDe(n.href));
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) if (e.isIntersecting) setAtiva(e.target.id);
@@ -61,9 +63,9 @@ export function SiteHeader() {
             <a
               key={item.href}
               href={item.href}
-              aria-current={ativa === item.href.slice(1) ? "location" : undefined}
+              aria-current={ativa === idDe(item.href) ? "location" : undefined}
               className={`text-sm transition-colors hover:text-accent ${
-                ativa === item.href.slice(1) ? "text-accent" : "text-paper/80"
+                ativa === idDe(item.href) ? "text-accent" : "text-paper/80"
               }`}
             >
               {item.label}
@@ -73,7 +75,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-3">
           <a
-            href="#contato"
+            href="/#contato"
             className="hidden btn-neon rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-ink sm:inline-block"
           >
             Agendar diagnóstico
@@ -112,7 +114,7 @@ export function SiteHeader() {
             ))}
             <li className="pt-2">
               <a
-                href="#contato"
+                href="/#contato"
                 onClick={() => setOpen(false)}
                 className="block rounded-md bg-accent px-3 py-3 text-center font-semibold text-ink"
               >

@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { AceitePrivacidade } from "@/components/aceite-privacidade";
 import { Funil } from "@/components/animated-icons";
 import { GlowCard, Section, SectionHead, PrimaryButton, inputCls } from "@/components/ui-bits";
 import { submitLead } from "@/lib/leads";
@@ -64,6 +65,7 @@ export function Diagnostico() {
   const [aviso, setAviso] = useState(false);
   const [resultado, setResultado] = useState<Cat | null>(null);
   const [email, setEmail] = useState("");
+  const [aceite, setAceite] = useState(false);
   const [estado, setEstado] = useState<"idle" | "enviando" | "ok" | "erro">("idle");
 
   const pergunta = PERGUNTAS[passo];
@@ -93,6 +95,7 @@ export function Diagnostico() {
     setResultado(null);
     setAviso(false);
     setEstado("idle");
+    setAceite(false);
   }
 
   async function enviarEmail(e: React.FormEvent) {
@@ -200,18 +203,21 @@ export function Diagnostico() {
             </div>
 
             {estado !== "ok" ? (
-              <form onSubmit={enviarEmail} className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu e-mail para receber este resultado"
-                  className={inputCls}
-                />
-                <PrimaryButton type="submit" disabled={estado === "enviando"}>
-                  {estado === "enviando" ? "Enviando..." : "Receber"}
-                </PrimaryButton>
+              <form onSubmit={enviarEmail} className="mt-8 space-y-3">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Seu e-mail para receber este resultado"
+                    className={inputCls}
+                  />
+                  <PrimaryButton type="submit" disabled={estado === "enviando"}>
+                    {estado === "enviando" ? "Enviando..." : "Receber"}
+                  </PrimaryButton>
+                </div>
+                <AceitePrivacidade checked={aceite} onChange={setAceite} />
               </form>
             ) : (
               <p className="mt-8 text-accent">Recebemos o seu e-mail. Entraremos em contato.</p>

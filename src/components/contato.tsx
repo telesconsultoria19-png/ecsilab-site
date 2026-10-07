@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { AceitePrivacidade } from "@/components/aceite-privacidade";
 import { CheckAnimado } from "@/components/animated-icons";
 import { EnergyFlow } from "@/components/energy-flow";
 import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
@@ -83,6 +84,8 @@ export function Contato() {
             <Field label="Resumo do seu gargalo comercial ou operacional">
               <textarea name="gargalo" rows={4} className={inputCls} />
             </Field>
+
+            <AceitePrivacidade />
 
             {estado === "erro" && (
               <p className="text-sm text-red-400" role="alert">

@@ -1,3 +1,4 @@
+import { VERSAO_LEGAL } from "./legal";
 import { supabase } from "./supabase";
 
 export type LeadKind = "contato" | "diagnostico" | "calculadora" | "solucao" | "material";
@@ -39,7 +40,10 @@ export async function submitLead(input: LeadInput): Promise<LeadResult> {
     revenue_range: input.revenue_range ?? null,
     message: input.message ?? null,
     solution_slug: input.solution_slug ?? null,
-    payload: input.payload ?? {},
+    payload: {
+      ...(input.payload ?? {}),
+      aceite: { politica: VERSAO_LEGAL, termos: VERSAO_LEGAL, em: new Date().toISOString() },
+    },
     source_path: typeof window !== "undefined" ? window.location.pathname : null,
   });
 

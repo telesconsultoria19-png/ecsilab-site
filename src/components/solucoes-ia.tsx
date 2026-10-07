@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { AceitePrivacidade } from "@/components/aceite-privacidade";
 import { CheckAnimado, NosConectados } from "@/components/animated-icons";
 import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
 import { submitLead } from "@/lib/leads";
@@ -70,6 +71,7 @@ function Interesse({ solucao, onClose }: { solucao: Solucao; onClose: () => void
             <Field label="Empresa">
               <input name="empresa" required className={inputCls} />
             </Field>
+            <AceitePrivacidade />
             {estado === "erro" && (
               <p className="text-sm text-red-400" role="alert">
                 {erro}
