@@ -233,7 +233,7 @@ export function MotionRestricoes() {
     const dimensionar = () => {
       cw = raiz.clientWidth;
       vertical = cw < 640;
-      ch = vertical ? Math.round(130 + L * 0.4 + 180) : Math.round(Math.min(640, Math.max(380, cw * 0.46)));
+      ch = vertical ? Math.round(130 + L * 0.4 + 180) : Math.round(Math.min(800, Math.max(400, cw * 0.5)));
       raiz.style.height = `${ch}px`;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(cw * dpr);
@@ -243,7 +243,7 @@ export function MotionRestricoes() {
 
     // posição na tela de um ponto do tubo: u ao longo, v de lado
     const P = (u: number, v: number): [number, number] =>
-      vertical ? [cw * 0.46 + v * sc, 130 + u * sc] : [80 * sc + u * sc, ch * 0.585 + v * sc];
+      vertical ? [cw * 0.46 + v * sc, 130 + u * sc] : [80 * sc + u * sc, ch * 0.54 + v * sc];
 
     const desenhar = () => {
       const { s } = sim;
