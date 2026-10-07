@@ -17,8 +17,8 @@ export function Hero() {
         </h1>
 
         <p className="mt-8 max-w-2xl text-lg leading-relaxed text-paper/80 sm:text-xl">
-          A ecsilab é o laboratório onde engenharia de processos, estratégia de growth, marketing e
-          máquinas de vendas se unem para tirar a sua empresa do improviso.
+          A Écsilab é onde Marketing, Engenharia de Processos, Estratégia de Growth, e Máquinas de
+          Vendas se unem para tirar o seu negócio do improviso.
         </p>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
