@@ -7,9 +7,11 @@ import { Contato } from "@/components/contato";
 import { Diagnostico } from "@/components/diagnostico";
 import { Hero } from "@/components/hero";
 import { Metodo } from "@/components/metodo";
+import { MotionPasto } from "@/components/motion-pasto";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SolucoesIA } from "@/components/solucoes-ia";
+import { Eyebrow, Section } from "@/components/ui-bits";
 import { Socios } from "@/components/socios";
 import { SECOES_VISIVEIS } from "@/lib/secoes";
 import { DESCRICAO_PADRAO, TITULO_PADRAO, seo } from "@/lib/seo";
@@ -26,6 +28,12 @@ function Home() {
       <main>
         <Hero />
         <Metodo />
+        <Section id="manifesto">
+          <div className="reveal">
+            <Eyebrow>A Écsilab em 15 segundos</Eyebrow>
+            <MotionPasto />
+          </div>
+        </Section>
         <Socios />
         <Diagnostico />
         <Calculadora />
