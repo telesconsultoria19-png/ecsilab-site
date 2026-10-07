@@ -81,7 +81,7 @@ export function Metodo() {
         <SectionHead
           eyebrow="Engenharia de processos e growth"
           title="O motor de operação e governança"
-          lead="Não trabalhamos no “eu acho”. A ecsilab opera sob três governanças que organizam o fluxo de geração de receita."
+          lead="Não trabalhamos no “eu acho”. A Écsilab opera sob três governanças que organizam o fluxo de geração de receita."
         />
         <div className="grid gap-6 md:grid-cols-3">
           {PILARES.map((pl) => (

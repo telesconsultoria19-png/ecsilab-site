@@ -1,4 +1,4 @@
-// Política de Privacidade e Termos de Uso da ecsilab.
+// Política de Privacidade e Termos de Uso da Écsilab.
 // Texto-base redigido a partir do que o site realmente coleta e faz hoje.
 // ATENÇÃO: é um rascunho. Revise com um advogado antes de tratar como definitivo.
 
@@ -11,7 +11,7 @@ export const VERSAO_LEGAL = "2026-10-06";
  * endereço e e-mail para os pedidos de titulares.
  */
 export const RESPONSAVEL = {
-  nome: "ecsilab",
+  nome: "Écsilab",
   razaoSocial: "Marcelo Teles Barbosa, empresário individual",
   cnpj: "33.861.777/0001-08",
   endereco: "Av. Duque de Caxias, 931, Central, Macapá, AP, CEP 68900-071",
@@ -46,8 +46,8 @@ export const POLITICA: DocumentoLegal = {
       id: "quem-somos",
       titulo: "1. Quem somos e a quem esta política se aplica",
       paragrafos: [
-        'Esta Política explica como a ecsilab ("nós"), responsável pelo site ecsilab.com.br ("Site"), trata dados pessoais de quem visita o Site, de quem faz o diagnóstico, de quem pede contato ou informações sobre as nossas soluções e de representantes de empresas interessadas nos nossos serviços. O tratamento segue a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).',
-        `A ecsilab é operada por ${RESPONSAVEL.razaoSocial}, inscrito no CNPJ sob o nº ${RESPONSAVEL.cnpj}, com sede em Macapá, AP.`,
+        'Esta Política explica como a Écsilab ("nós"), responsável pelo site ecsilab.com.br ("Site"), trata dados pessoais de quem visita o Site, de quem faz o diagnóstico, de quem pede contato ou informações sobre as nossas soluções e de representantes de empresas interessadas nos nossos serviços. O tratamento segue a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).',
+        `A Écsilab é operada por ${RESPONSAVEL.razaoSocial}, inscrito no CNPJ sob o nº ${RESPONSAVEL.cnpj}, com sede em Macapá, AP.`,
         'Para a LGPD, somos a controladora dos seus dados. Você fala com a nossa equipe sobre privacidade pelos canais da seção "Contato e identificação", no fim desta página.',
       ],
     },
@@ -90,7 +90,7 @@ export const POLITICA: DocumentoLegal = {
         "Compartilhamos dados somente com quem precisa deles para o Site funcionar e para atender o seu pedido:",
       ],
       itens: [
-        "Os sócios e a equipe da ecsilab, que respondem aos pedidos recebidos.",
+        "Os sócios e a equipe da Écsilab, que respondem aos pedidos recebidos.",
         "Banco de dados: Supabase, onde os formulários enviados ficam guardados, em servidor na região de São Paulo.",
         "Hospedagem e segurança do Site: Cloudflare.",
         "Envio de e-mails (por exemplo, o aviso interno de novo contato), quando ativo: Resend.",
@@ -184,7 +184,7 @@ export const POLITICA: DocumentoLegal = {
 // ── Termos de Uso ────────────────────────────────────────────────────────
 export const TERMOS: DocumentoLegal = {
   titulo: "Termos de Uso",
-  resumo: "As regras para usar o Site e as ferramentas gratuitas da ecsilab, escritas de forma direta.",
+  resumo: "As regras para usar o Site e as ferramentas gratuitas da Écsilab, escritas de forma direta.",
   secoes: [
     {
       id: "aceite",
@@ -198,7 +198,7 @@ export const TERMOS: DocumentoLegal = {
       id: "servico",
       titulo: "2. O que o Site oferece",
       paragrafos: [
-        "O Site apresenta a ecsilab, os nossos serviços de growth, marketing e processos, o nosso portfólio de soluções de inteligência artificial e as ferramentas gratuitas de diagnóstico e de cálculo. Ele também reúne os canais para você falar com a gente.",
+        "O Site apresenta a Écsilab, os nossos serviços de growth, marketing e processos, o nosso portfólio de soluções de inteligência artificial e as ferramentas gratuitas de diagnóstico e de cálculo. Ele também reúne os canais para você falar com a gente.",
       ],
     },
     {
@@ -247,7 +247,7 @@ export const TERMOS: DocumentoLegal = {
       id: "propriedade",
       titulo: "8. Propriedade intelectual",
       paragrafos: [
-        "Os textos, a marca ecsilab, o layout, os nomes das soluções, as ferramentas e os métodos apresentados no Site pertencem à ecsilab ou aos seus licenciantes. Você recebe uma licença pessoal, limitada e intransferível para usar as ferramentas gratuitas e ler o conteúdo, sem direito de reproduzi-los ou explorá-los comercialmente.",
+        "Os textos, a marca Écsilab, o layout, os nomes das soluções, as ferramentas e os métodos apresentados no Site pertencem à Écsilab ou aos seus licenciantes. Você recebe uma licença pessoal, limitada e intransferível para usar as ferramentas gratuitas e ler o conteúdo, sem direito de reproduzi-los ou explorá-los comercialmente.",
       ],
     },
     {

@@ -37,13 +37,13 @@ function Lista({ oculta = false }: { oculta?: boolean }) {
   );
 }
 
-/** Letreiro com as entregas da ecsilab, correndo de um lado ao outro da tela. */
+/** Letreiro com as entregas da Écsilab, correndo de um lado ao outro da tela. */
 export function Marquee() {
   return (
     <div
       className="marquee relative z-10 bg-white/[0.04] py-5 backdrop-blur-sm"
       role="region"
-      aria-label="O que a ecsilab entrega"
+      aria-label="O que a Écsilab entrega"
     >
       <div className="marquee-mask overflow-hidden">
         <div className="marquee-track flex w-max">

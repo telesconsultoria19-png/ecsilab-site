@@ -195,7 +195,7 @@ export function Diagnostico() {
             </div>
 
             <div className="mt-8 rounded-xl bg-white/[0.05] p-5">
-              <p className="font-semibold text-accent">Solução recomendada pela ecsilab</p>
+              <p className="font-semibold text-accent">Solução recomendada pela Écsilab</p>
               <p className="mt-2 text-paper/80">
                 Estruturamos e rodamos o processo ágil de marketing e vendas da sua empresa, com
                 governança por OKR, para quebrar esse gargalo.

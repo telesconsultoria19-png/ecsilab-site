@@ -1,6 +1,6 @@
 # ecsilab-site
 
-Site da ecsilab (X-Lab). TanStack Start + Tailwind, publicado no Cloudflare; banco e login no Supabase.
+Site da Écsilab (X-Lab). TanStack Start + Tailwind, publicado no Cloudflare; banco e login no Supabase.
 
 - `npm run dev` — desenvolvimento local (porta 5200)
 - `npm run typecheck` — checagem de tipos

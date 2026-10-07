@@ -101,7 +101,7 @@ export function montarEmail(lead: Lead) {
   const wa = lead.phone ? linkWhatsApp(lead.phone) : null;
   const html = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#000;font-family:Arial,Helvetica,sans-serif;color:#fff">
 <div style="max-width:560px;margin:0 auto;padding:24px">
-  <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#fdca0a">ecsilab · novo lead</p>
+  <p style="margin:0 0 4px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#fdca0a">Écsilab · novo lead</p>
   <h1 style="margin:0 0 20px;font-size:22px;line-height:1.3">${escaparHtml(assunto.replace(/^Novo lead: /, ""))}</h1>
   <table style="width:100%;border-collapse:collapse;font-size:15px">
     ${preenchidas
@@ -118,7 +118,7 @@ export function montarEmail(lead: Lead) {
   <p style="margin:24px 0 0;font-size:12px;color:#777">Todos os leads: Supabase, tabela “leads”.</p>
 </div></body></html>`;
 
-  const texto = [`ecsilab · novo lead`, assunto.replace(/^Novo lead: /, ""), "", ...preenchidas.map(([k, v]) => `${k}: ${v}`), wa ? `\nWhatsApp: ${wa}` : ""].join("\n");
+  const texto = [`Écsilab · novo lead`, assunto.replace(/^Novo lead: /, ""), "", ...preenchidas.map(([k, v]) => `${k}: ${v}`), wa ? `\nWhatsApp: ${wa}` : ""].join("\n");
 
   return { assunto, html, texto };
 }

@@ -43,7 +43,7 @@ export function Socios() {
       <SectionHead
         eyebrow="Quem comanda o laboratório"
         title="Dois sócios, dois territórios, um objetivo: receita previsível"
-        lead="A ecsilab junta duas formas complementares de enxergar o crescimento: a engenharia dos processos e a lógica dos números do negócio."
+        lead="A Écsilab junta duas formas complementares de enxergar o crescimento: a engenharia dos processos e a lógica dos números do negócio."
       />
 
       <div className="space-y-16 md:space-y-28">

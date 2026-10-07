@@ -240,7 +240,7 @@ export function Mascote({ className = "h-20 w-20" }: { className?: string }) {
       className={`relative inline-block ${className}`}
       onPointerEnter={() => setN((v) => v + 1)}
     >
-      <img src="/ovelha.png" alt="Ovelha negra, mascote da ecsilab" className="h-full w-full rounded-lg" />
+      <img src="/ovelha.png" alt="Ovelha negra, mascote da Écsilab" className="h-full w-full rounded-lg" />
       {(visto || n > 0) && (
         <span
           key={n}

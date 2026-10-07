@@ -119,7 +119,7 @@ export function Clientes() {
     <Section id="clientes">
       <SectionHead
         eyebrow="Depoimentos e trabalhos construídos"
-        title="Empresas que já construíram com a ecsilab"
+        title="Empresas que já construíram com a Écsilab"
         lead="Projetos de marketing, processos e tecnologia em negócios de segmentos diferentes."
       />
 

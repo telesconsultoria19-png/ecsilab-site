@@ -6,11 +6,11 @@ import { POLITICA } from "@/lib/legal";
 export const Route = createFileRoute("/politica-de-privacidade")({
   head: () => ({
     meta: [
-      { title: "Política de Privacidade | ecsilab" },
+      { title: "Política de Privacidade | Écsilab" },
       {
         name: "description",
         content:
-          "Como a ecsilab coleta, usa e protege os seus dados pessoais, em conformidade com a LGPD.",
+          "Como a Écsilab coleta, usa e protege os seus dados pessoais, em conformidade com a LGPD.",
       },
     ],
   }),

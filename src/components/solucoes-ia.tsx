@@ -100,7 +100,7 @@ export function SolucoesIA() {
   return (
     <Section id="solucoes-ia">
       <SectionHead
-        eyebrow="Portfólio ecsilab"
+        eyebrow="Portfólio Écsilab"
         title="Soluções de inteligência artificial para a sua operação"
         lead="Soluções prontas que implantamos na sua empresa, uma a uma ou em pacotes, para ganhar velocidade em vendas, atendimento, finanças e gestão."
       />

@@ -54,8 +54,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="/" aria-label="ecsilab, página inicial" className="flex items-center">
-          <img src="/logo-ecsilab.png" alt="ecsilab" className="h-8 w-auto" />
+        <a href="/" aria-label="Écsilab, página inicial" className="flex items-center">
+          <img src="/logo-ecsilab.png" alt="Écsilab" className="h-8 w-auto" />
         </a>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">

@@ -10,8 +10,8 @@ export function SiteFooter() {
     <footer>
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-center md:justify-between">
         <div>
-          <a href="/" aria-label="ecsilab, página inicial">
-            <img src="/logo-ecsilab.png" alt="ecsilab" className="h-7 w-auto" />
+          <a href="/" aria-label="Écsilab, página inicial">
+            <img src="/logo-ecsilab.png" alt="Écsilab" className="h-7 w-auto" />
           </a>
           <p className="mt-3 text-sm text-paper/60">Growth, processos e escala comercial.</p>
           <nav aria-label="Informações legais" className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-paper/70">
@@ -32,7 +32,7 @@ export function SiteFooter() {
         </div>
         <div className="flex items-center gap-5">
           <p className="text-sm text-paper/50">
-            © {new Date().getFullYear()} ecsilab.
+            © {new Date().getFullYear()} Écsilab.
             {r.razaoSocial ? ` ${r.razaoSocial}${r.cnpj ? `, CNPJ ${r.cnpj}` : ""}.` : ""} Todos os direitos
             reservados.
           </p>

@@ -30,11 +30,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ecsilab | Growth, processos e escala comercial" },
+      { title: "Écsilab | Growth, processos e escala comercial" },
       {
         name: "description",
         content:
-          "ecsilab: laboratório de growth, marketing e processos para empresas de serviço que querem crescer com previsibilidade.",
+          "Écsilab: laboratório de growth, marketing e processos para empresas de serviço que querem crescer com previsibilidade.",
       },
     ],
     links: [

@@ -6,10 +6,10 @@ import { TERMOS } from "@/lib/legal";
 export const Route = createFileRoute("/termos-de-uso")({
   head: () => ({
     meta: [
-      { title: "Termos de Uso | ecsilab" },
+      { title: "Termos de Uso | Écsilab" },
       {
         name: "description",
-        content: "As regras para usar o site e as ferramentas gratuitas da ecsilab.",
+        content: "As regras para usar o site e as ferramentas gratuitas da Écsilab.",
       },
     ],
   }),
