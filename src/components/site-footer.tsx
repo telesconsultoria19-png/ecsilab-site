@@ -32,8 +32,9 @@ export function SiteFooter() {
         </div>
         <div className="flex items-center gap-5">
           <p className="text-sm text-paper/50">
-            © {new Date().getFullYear()} {r.razaoSocial || "ecsilab"}.
-            {r.cnpj ? ` CNPJ ${r.cnpj}.` : ""} Todos os direitos reservados.
+            © {new Date().getFullYear()} ecsilab.
+            {r.razaoSocial ? ` ${r.razaoSocial}${r.cnpj ? `, CNPJ ${r.cnpj}` : ""}.` : ""} Todos os direitos
+            reservados.
           </p>
           <Mascote className="h-16 w-16 shrink-0" />
         </div>

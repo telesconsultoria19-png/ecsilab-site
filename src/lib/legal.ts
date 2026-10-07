@@ -12,8 +12,8 @@ export const VERSAO_LEGAL = "2026-10-06";
  */
 export const RESPONSAVEL = {
   nome: "ecsilab",
-  razaoSocial: "",
-  cnpj: "",
+  razaoSocial: "Marcelo Teles Barbosa, empresário individual",
+  cnpj: "33.861.777/0001-08",
   endereco: "Av. Duque de Caxias, 931, Central, Macapá, AP, CEP 68900-071",
   email: "telesconsultoria19@gmail.com",
   whatsapp: "+55 96 98429-2017",
@@ -47,6 +47,7 @@ export const POLITICA: DocumentoLegal = {
       titulo: "1. Quem somos e a quem esta política se aplica",
       paragrafos: [
         'Esta Política explica como a ecsilab ("nós"), responsável pelo site ecsilab.com.br ("Site"), trata dados pessoais de quem visita o Site, de quem faz o diagnóstico, de quem pede contato ou informações sobre as nossas soluções e de representantes de empresas interessadas nos nossos serviços. O tratamento segue a Lei Geral de Proteção de Dados (LGPD, Lei nº 13.709/2018).',
+        `A ecsilab é operada por ${RESPONSAVEL.razaoSocial}, inscrito no CNPJ sob o nº ${RESPONSAVEL.cnpj}, com sede em Macapá, AP.`,
         'Para a LGPD, somos a controladora dos seus dados. Você fala com a nossa equipe sobre privacidade pelos canais da seção "Contato e identificação", no fim desta página.',
       ],
     },
@@ -288,7 +289,7 @@ export const TERMOS: DocumentoLegal = {
       id: "lei",
       titulo: "14. Lei aplicável e foro",
       paragrafos: [
-        "Estes Termos seguem a lei brasileira. Havendo relação de consumo, fica eleito o foro do domicílio do consumidor. Nos demais casos, o foro da comarca da sede da ecsilab.",
+        "Estes Termos seguem a lei brasileira. Havendo relação de consumo, fica eleito o foro do domicílio do consumidor. Nos demais casos, o foro da comarca de Macapá, AP.",
       ],
     },
   ],
