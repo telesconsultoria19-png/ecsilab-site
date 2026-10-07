@@ -14,9 +14,9 @@ export const RESPONSAVEL = {
   nome: "ecsilab",
   razaoSocial: "",
   cnpj: "",
-  endereco: "",
-  email: "",
-  whatsapp: "",
+  endereco: "Av. Duque de Caxias, 931, Central, Macapá, AP, CEP 68900-071",
+  email: "telesconsultoria19@gmail.com",
+  whatsapp: "+55 96 98429-2017",
   site: "ecsilab.com.br",
 };
 
