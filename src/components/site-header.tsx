@@ -4,9 +4,9 @@ import { Menu, X } from "lucide-react";
 const idDe = (href: string) => href.split("#")[1] ?? "";
 
 export const NAV = [
-  { href: "/#metodo", label: "Método" },
   { href: "/#socios", label: "Sócios" },
   { href: "/#diagnostico", label: "Diagnóstico" },
+  { href: "/#metodo", label: "Método" },
   { href: "/#solucoes-ia", label: "Soluções de IA" },
   { href: "/#contato", label: "Contato" },
 ];
