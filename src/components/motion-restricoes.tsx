@@ -8,10 +8,13 @@ import { useEffect, useRef, useState } from "react";
  * então a capacidade de cada zona nasce da largura dela e a fila se forma sozinha antes da zona mais estreita.
  * A saída do lado direito é limitada por essa zona: a restrição.
  *
- *   0 s   a zona 4 é a restrição; a fila cresce antes dela
+ *   0 s   a zona 4 é a restrição (33 bolinhas/s); a fila cresce antes dela
  *   6 s   ampliamos as zonas 1 e 3: entra mais, a fila engorda, a saída não muda
- *  15 s   a Écsilab amplia a zona 4: o fluxo à direita aumenta
- *  25 s   a próxima restrição (zona 2) aparece; a Écsilab vai até lá e a amplia
+ *  15 s   a Écsilab amplia a zona 4: a restrição passa para a zona 2 (110/s) e o velocímetro pisca
+ *  25 s   a Écsilab vai até a zona 2 e a amplia: a restrição passa para a zona 5 (130/s) e pisca de novo
+ *
+ * O número mostrado é a velocidade que o sistema suporta (capacidade da restrição), sempre crescente em cada
+ * conquista. A vazão medida na saída oscila quando o estoque da fila é solto, por isso não é a exibida.
  *  33 s   o sistema volta suavemente ao começo e o ciclo recomeça
  */
 
@@ -19,7 +22,7 @@ import { useEffect, useRef, useState } from "react";
 const L = 1920;
 const NZ = 6;
 const ZL = L / NZ;
-const BASE = [220, 150, 240, 60, 200, 230];
+const BASE = [220, 200, 240, 60, 236, 300];
 const R = 7; // raio da bolinha
 const DD = R * 2 * 1.55; // diâmetro com folga (bolinhas respiram, mesmo na fila cheia)
 const V = 260; // velocidade livre (unidades por segundo)
@@ -51,8 +54,8 @@ function alvos(t: number): number[] {
     w[0] = 300;
     w[2] = 320;
   }
-  if (t >= 15 && t < 33.5) w[3] = 210;
-  if (t >= 25 && t < 33.5) w[1] = 260;
+  if (t >= 15 && t < 33.5) w[3] = 270;
+  if (t >= 25 && t < 33.5) w[1] = 300;
   return w;
 }
 
@@ -138,6 +141,8 @@ function criarSim() {
       s.saidas.length = 0;
     },
     vazao: () => s.saidas.length / 2,
+    /** Velocidade que o sistema suporta: a capacidade da zona mais estreita (a restrição). */
+    capacidade: () => Math.min(...s.w.map((w) => (V * w) / (DD * DD))),
   };
 }
 
@@ -157,6 +162,8 @@ export function MotionRestricoes() {
   const saidaRef = useRef<HTMLSpanElement>(null);
   const vazaoRef = useRef<HTMLSpanElement>(null);
   const hudRef = useRef<HTMLDivElement>(null);
+  const numeroRef = useRef<HTMLParagraphElement>(null);
+  const novaRef = useRef<HTMLParagraphElement>(null);
   const [pausado, setPausado] = useState(false);
   const alternarRef = useRef<() => void>(() => {});
   const legendasRef = useRef<Array<HTMLParagraphElement | null>>([]);
@@ -184,6 +191,44 @@ export function MotionRestricoes() {
     let visivel = false; // o palco está na tela?
     let pausadoUsuario = reduzir; // quem pediu para parar (ou prefere menos movimento)
     let vazaoMostrada = 0; // número suavizado, para não "tremer" na tela
+    let zrAnterior = -1; // última restrição vista
+    let patamar = 0; // velocidade da última conquista (a piscada só vale para um patamar maior)
+    let piscadas = 0;
+
+    /** Zona de restrição atual e a velocidade que o sistema suporta. */
+    const restricao = () => {
+      let z = 0;
+      for (let i = 1; i < NZ; i++) if ((sim.s.w[i] ?? 0) < (sim.s.w[z] ?? 0)) z = i;
+      return { z, cap: sim.capacidade() };
+    };
+
+    /** Nova velocidade conquistada: o velocímetro pisca e uma etiqueta avisa. */
+    const piscar = () => {
+      piscadas++;
+      const n = numeroRef.current;
+      const e = novaRef.current;
+      n?.animate(
+        [
+          { opacity: 1, transform: "scale(1)", filter: "brightness(1)" },
+          { opacity: 0.2, transform: "scale(1.08)", filter: "brightness(1.8)", offset: 0.16 },
+          { opacity: 1, transform: "scale(1.16)", filter: "brightness(1.7)", offset: 0.32 },
+          { opacity: 0.25, transform: "scale(1.08)", filter: "brightness(1.8)", offset: 0.48 },
+          { opacity: 1, transform: "scale(1.16)", filter: "brightness(1.7)", offset: 0.64 },
+          { opacity: 0.35, transform: "scale(1.06)", filter: "brightness(1.5)", offset: 0.8 },
+          { opacity: 1, transform: "scale(1)", filter: "brightness(1)" },
+        ],
+        { duration: 1700, easing: "ease-in-out" },
+      );
+      e?.animate(
+        [
+          { opacity: 0, transform: "translateY(6px)" },
+          { opacity: 1, transform: "translateY(0)", offset: 0.12 },
+          { opacity: 1, transform: "translateY(0)", offset: 0.82 },
+          { opacity: 0, transform: "translateY(-4px)" },
+        ],
+        { duration: 2600, easing: "ease-out" },
+      );
+    };
 
     const dimensionar = () => {
       cw = raiz.clientWidth;
@@ -375,7 +420,15 @@ export function MotionRestricoes() {
       // textos do DOM: legendas e contador
       if (hudRef.current) hudRef.current.style.opacity = String(s.t < 20 ? suave(0, 1.2, s.t) : 1 - suave(38.4, 39.8, s.t));
       if (saidaRef.current) saidaRef.current.textContent = s.saida.toLocaleString("pt-BR");
-      vazaoMostrada += (sim.vazao() - vazaoMostrada) * 0.06;
+      const { z: zAtual, cap } = restricao();
+      vazaoMostrada += (cap - vazaoMostrada) * 0.05;
+      // a restrição trocou e a velocidade subiu de patamar: é uma conquista
+      if (zrAnterior !== -1 && zAtual !== zrAnterior && cap > patamar * 1.05) {
+        patamar = cap;
+        piscar();
+      }
+      patamar = Math.min(patamar, cap); // se a velocidade cai (volta ao início), o patamar acompanha
+      zrAnterior = zAtual;
       if (vazaoRef.current) vazaoRef.current.textContent = Math.round(vazaoMostrada).toLocaleString("pt-BR");
       LEGENDAS.forEach((l, i) => {
         const el = legendasRef.current[i];
@@ -420,7 +473,9 @@ export function MotionRestricoes() {
       for (let k = 0; k < 60 * 6; k++) sim.passo(1 / 60);
     }
     ovelha.onload = desenhar;
-    vazaoMostrada = sim.vazao();
+    vazaoMostrada = sim.capacidade();
+    patamar = vazaoMostrada;
+    zrAnterior = restricao().z;
     desenhar();
 
     const ro = new ResizeObserver(() => {
@@ -458,10 +513,12 @@ export function MotionRestricoes() {
           sim.s.saidas = [];
           sim.s.relogio = 0;
           while (sim.s.t < alvo) sim.passo(1 / 60);
-          vazaoMostrada = sim.vazao();
+          vazaoMostrada = sim.capacidade();
+          patamar = sim.capacidade();
+          zrAnterior = restricao().z;
           desenhar();
         },
-        estado: () => ({ t: sim.s.t, bolas: sim.s.bolas.length, saida: sim.s.saida, vazao: sim.vazao(), w: sim.s.w.map((x) => Math.round(x)) }),
+        estado: () => ({ piscadas, capacidade: Math.round(sim.capacidade()), mostrado: Math.round(vazaoMostrada), restricao: restricao().z + 1, t: sim.s.t, bolas: sim.s.bolas.length, saida: sim.s.saida, vazao: sim.vazao(), w: sim.s.w.map((x) => Math.round(x)) }),
       };
     }
 
@@ -523,9 +580,24 @@ export function MotionRestricoes() {
 
         {/* o destaque é a vazão (bolinhas por segundo); o total acumulado fica em segundo plano */}
         <div ref={hudRef} aria-hidden="true" className="pointer-events-none absolute bottom-[3%] right-[17%] text-right">
-          <p className="text-[clamp(38px,5.2vw,78px)] font-extrabold leading-none text-accent drop-shadow-[0_0_22px_rgba(253,202,10,0.5)]">
-            <span ref={vazaoRef}>0</span>
-          </p>
+          <div className="relative inline-block">
+            {/* aparece só quando uma nova velocidade é conquistada, ao lado do número */}
+            <div className="absolute right-full top-0 mr-[clamp(10px,1.4vw,22px)] flex h-full items-center">
+              <p
+                ref={novaRef}
+                style={{ opacity: 0 }}
+                className="whitespace-nowrap text-[clamp(10px,1vw,15px)] font-bold uppercase tracking-[0.2em] text-accent"
+              >
+                ↑ nova velocidade
+              </p>
+            </div>
+            <p
+              ref={numeroRef}
+              className="origin-right text-[clamp(38px,5.2vw,78px)] font-extrabold leading-none text-accent drop-shadow-[0_0_22px_rgba(253,202,10,0.5)]"
+            >
+              <span ref={vazaoRef}>0</span>
+            </p>
+          </div>
           <p className="mt-1 text-[clamp(11px,1.15vw,17px)] font-bold uppercase tracking-[0.18em] text-white">
             bolinhas por segundo
           </p>
