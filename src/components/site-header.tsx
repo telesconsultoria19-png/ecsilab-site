@@ -1,13 +1,15 @@
+import { useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
 const idDe = (href: string) => href.split("#")[1] ?? "";
 
-export const NAV = [
+export const NAV: Array<{ href: string; label: string; pagina?: boolean }> = [
   { href: "/#time", label: "Time" },
   { href: "/#diagnostico", label: "Diagnóstico" },
   { href: "/#metodo", label: "Método" },
   { href: "/#portfolio", label: "Portfólio" },
+  { href: "/enterprise", label: "Enterprise", pagina: true },
   { href: "/#contato", label: "Contato" },
 ];
 
@@ -15,10 +17,11 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [ativa, setAtiva] = useState("");
   const [progresso, setProgresso] = useState(0);
+  const caminho = useRouterState({ select: (s) => s.location.pathname });
 
   // Destaca no menu a seção que está na tela.
   useEffect(() => {
-    const ids = NAV.map((n) => idDe(n.href));
+    const ids = NAV.filter((n) => !n.pagina).map((n) => idDe(n.href));
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) if (e.isIntersecting) setAtiva(e.target.id);
@@ -60,18 +63,25 @@ export function SiteHeader() {
         </a>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
-          {NAV.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              aria-current={ativa === idDe(item.href) ? "location" : undefined}
-              className={`text-sm transition-colors hover:text-accent ${
-                ativa === idDe(item.href) ? "text-accent" : "text-paper/80"
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
+          {NAV.map((item) => {
+            const atual = item.pagina ? caminho === item.href : ativa === idDe(item.href);
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                aria-current={atual ? (item.pagina ? "page" : "location") : undefined}
+                className={
+                  item.pagina
+                    ? `rounded-full px-3.5 py-1.5 text-sm font-semibold transition hover:bg-accent hover:text-ink ${
+                        atual ? "bg-accent text-ink" : "bg-accent/[0.14] text-accent"
+                      }`
+                    : `text-sm transition-colors hover:text-accent ${atual ? "text-accent" : "text-paper/80"}`
+                }
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -107,7 +117,10 @@ export function SiteHeader() {
                 <a
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-paper/90 hover:bg-line"
+                  aria-current={item.pagina && caminho === item.href ? "page" : undefined}
+                  className={`block rounded-md px-3 py-3 hover:bg-line ${
+                    item.pagina ? "font-semibold text-accent" : "text-paper/90"
+                  }`}
                 >
                   {item.label}
                 </a>

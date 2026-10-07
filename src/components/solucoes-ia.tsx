@@ -213,6 +213,26 @@ export function SolucoesIA() {
 
       </div>
 
+      {/* convite para o nível Enterprise (página própria) */}
+      <GlowCard className="mt-20 flex flex-col gap-6 p-8 sm:flex-row sm:items-center sm:justify-between sm:p-10">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Écsilab Enterprise</p>
+          <h3 className="mt-3 text-2xl font-extrabold leading-tight sm:text-3xl">
+            Quer automatizar um departamento inteiro?
+          </h3>
+          <p className="mt-3 leading-relaxed text-paper/75">
+            Implantamos a infraestrutura na sua empresa, em projeto de pagamento único, e ela fica sendo
+            sua. Sem mensalidade nossa para continuar funcionando.
+          </p>
+        </div>
+        <a
+          href="/enterprise"
+          className="btn-neon shrink-0 rounded-xl bg-accent px-6 py-3.5 text-center font-semibold text-ink"
+        >
+          Conhecer o Enterprise
+        </a>
+      </GlowCard>
+
       {aberta && <Interesse solucao={aberta} onClose={() => setAberta(null)} />}
     </Section>
   );
