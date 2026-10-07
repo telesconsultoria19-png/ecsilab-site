@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AceitePrivacidade } from "@/components/aceite-privacidade";
 import { CheckAnimado } from "@/components/animated-icons";
 import { EnergyFlow } from "@/components/energy-flow";
+import { WHATSAPP_EXIBICAO, linkWhatsApp } from "@/lib/contato";
 import { GlowCard, Section, SectionHead, PrimaryButton, Field, inputCls } from "@/components/ui-bits";
 import { FAIXAS_FATURAMENTO, submitLead } from "@/lib/leads";
 
@@ -43,6 +44,20 @@ export function Contato() {
         title="Inicie o seu experimento estratégico"
         lead="Conte rapidamente o seu cenário. Marcelo Teles, Marcos Schneider ou nossa equipe falam com você para validar o melhor próximo passo."
       />
+
+      <div className="reveal mb-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <a
+          href={linkWhatsApp()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-neon rounded-xl bg-accent px-6 py-3.5 font-semibold text-ink"
+        >
+          Chamar no WhatsApp
+        </a>
+        <span className="text-paper/70">
+          ou salve o WhatsApp <span className="font-semibold text-paper">{WHATSAPP_EXIBICAO}</span>
+        </span>
+      </div>
 
       <GlowCard className="max-w-2xl p-6 sm:p-10">
         {estado === "ok" ? (

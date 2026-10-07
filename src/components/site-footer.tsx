@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { Mascote } from "@/components/animated-icons";
 import { EVENTO_ABRIR_CONSENTIMENTO } from "@/components/consent-banner";
+import { WHATSAPP_EXIBICAO, linkWhatsApp } from "@/lib/contato";
 import { RESPONSAVEL } from "@/lib/legal";
 
 export function SiteFooter() {
@@ -14,6 +15,12 @@ export function SiteFooter() {
             <img src="/logo-ecsilab.png" alt="Écsilab" className="h-7 w-auto" />
           </a>
           <p className="mt-3 text-sm text-paper/60">Growth, processos e escala comercial.</p>
+          <p className="mt-2 text-sm text-paper/70">
+            WhatsApp:{" "}
+            <a href={linkWhatsApp()} target="_blank" rel="noopener noreferrer" className="font-semibold text-accent hover:underline">
+              {WHATSAPP_EXIBICAO}
+            </a>
+          </p>
           <nav aria-label="Informações legais" className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-paper/70">
             <Link to="/politica-de-privacidade" className="hover:text-accent">
               Política de Privacidade

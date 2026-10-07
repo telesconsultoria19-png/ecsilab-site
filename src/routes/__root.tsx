@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 
 import { Mascote } from "../components/animated-icons";
 import { ConsentBanner } from "../components/consent-banner";
+import { WhatsAppFlutuante } from "../components/whatsapp-flutuante";
 import appCss from "../styles.css?url";
 
 function NotFound() {
@@ -66,6 +67,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <WhatsAppFlutuante />
       <ConsentBanner />
     </QueryClientProvider>
   );
