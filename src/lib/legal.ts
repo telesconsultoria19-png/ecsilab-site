@@ -3,7 +3,7 @@
 // ATENÇÃO: é um rascunho. Revise com um advogado antes de tratar como definitivo.
 
 /** Mude esta data sempre que alterar um dos documentos: o aviso de aceite volta a aparecer para todos. */
-export const VERSAO_LEGAL = "2026-10-06";
+export const VERSAO_LEGAL = "2026-10-07";
 
 /**
  * Identificação do responsável. Campos vazios não aparecem nas páginas.
@@ -90,7 +90,7 @@ export const POLITICA: DocumentoLegal = {
         "Compartilhamos dados somente com quem precisa deles para o Site funcionar e para atender o seu pedido:",
       ],
       itens: [
-        "Os sócios e a equipe da Écsilab, que respondem aos pedidos recebidos.",
+        "A equipe da Écsilab, que responde aos pedidos recebidos.",
         "Banco de dados: Supabase, onde os formulários enviados ficam guardados, em servidor na região de São Paulo.",
         "Hospedagem e segurança do Site: Cloudflare.",
         "Envio de e-mails (por exemplo, o aviso interno de novo contato), quando ativo: Resend.",
@@ -133,7 +133,7 @@ export const POLITICA: DocumentoLegal = {
       itens: [
         "Conexão protegida (HTTPS) em todo o Site.",
         "Regras de segurança no banco de dados: o visitante só consegue enviar informações pelos formulários. Ninguém consegue ler os dados de outras pessoas pelo Site.",
-        "Acesso aos dados recebidos restrito aos sócios e à equipe, mediante login.",
+        "Acesso aos dados recebidos restrito à equipe, mediante login.",
       ],
       depois: [
         "Nenhum sistema é totalmente imune a falhas. Se ocorrer um incidente que possa causar risco ou dano relevante, avisaremos você e a Autoridade Nacional de Proteção de Dados (ANPD), como a lei determina.",

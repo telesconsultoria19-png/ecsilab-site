@@ -12,7 +12,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SolucoesIA } from "@/components/solucoes-ia";
 import { SectionHead } from "@/components/ui-bits";
-import { Socios } from "@/components/socios";
+import { Time } from "@/components/time";
 import { SECOES_VISIVEIS } from "@/lib/secoes";
 import { DESCRICAO_PADRAO, TITULO_PADRAO, seo } from "@/lib/seo";
 
@@ -43,7 +43,7 @@ function Home() {
           </div>
           <MotionRestricoes />
         </section>
-        <Socios />
+        <Time />
         <Diagnostico />
         <Metodo />
         <Calculadora />

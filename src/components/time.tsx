@@ -1,7 +1,7 @@
 import { Fio } from "@/components/animated-icons";
 import { CountUp, Section, SectionHead } from "@/components/ui-bits";
 
-const SOCIOS = [
+const TIME = [
   {
     foto: "/marcelo-teles.jpg" as string | null,
     iniciais: "MT",
@@ -37,7 +37,7 @@ const SOCIOS = [
   },
 ];
 
-export function Socios() {
+export function Time() {
   return (
     <Section id="time">
       <SectionHead
@@ -47,7 +47,7 @@ export function Socios() {
       />
 
       <div className="space-y-16 md:space-y-28">
-        {SOCIOS.map((s, i) => (
+        {TIME.map((s, i) => (
           <article
             key={s.nome}
             className="reveal grid items-center gap-8 md:min-h-[70vh] md:grid-cols-2 md:gap-16"
