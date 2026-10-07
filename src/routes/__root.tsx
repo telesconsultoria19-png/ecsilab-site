@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { Mascote } from "../components/animated-icons";
 import { ConsentBanner } from "../components/consent-banner";
 import { WhatsAppFlutuante } from "../components/whatsapp-flutuante";
+import { DESCRICAO_PADRAO, SITE, TITULO_PADRAO } from "../lib/seo";
 import appCss from "../styles.css?url";
 
 function NotFound() {
@@ -31,12 +32,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Écsilab | Growth, processos e escala comercial" },
-      {
-        name: "description",
-        content:
-          "Écsilab: laboratório de growth, marketing e processos para empresas de serviço que querem crescer com previsibilidade.",
-      },
+      { title: TITULO_PADRAO },
+      { name: "description", content: DESCRICAO_PADRAO },
+      // Prévia ao compartilhar o link (WhatsApp, LinkedIn, Facebook, X): o que vale para o site todo
+      { property: "og:type", content: "website" },
+      { property: "og:locale", content: "pt_BR" },
+      { property: "og:site_name", content: "Écsilab" },
+      { property: "og:image", content: `${SITE}/og-image.jpg` },
+      { property: "og:image:type", content: "image/jpeg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Écsilab: enquanto o mercado segue o rebanho, a gente inventa o pasto." },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: `${SITE}/og-image.jpg` },
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/ovelha.png" },

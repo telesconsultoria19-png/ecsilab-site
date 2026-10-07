@@ -12,8 +12,10 @@ import { SiteHeader } from "@/components/site-header";
 import { SolucoesIA } from "@/components/solucoes-ia";
 import { Socios } from "@/components/socios";
 import { SECOES_VISIVEIS } from "@/lib/secoes";
+import { DESCRICAO_PADRAO, TITULO_PADRAO, seo } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
+  head: () => seo({ titulo: TITULO_PADRAO, descricao: DESCRICAO_PADRAO, caminho: "/" }),
   component: Home,
 });
 
