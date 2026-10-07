@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Teoria das Restrições, em loop contínuo e sem bordas (cerca de 40 s por ciclo).
@@ -156,6 +157,8 @@ export function MotionRestricoes() {
   const saidaRef = useRef<HTMLSpanElement>(null);
   const vazaoRef = useRef<HTMLSpanElement>(null);
   const hudRef = useRef<HTMLDivElement>(null);
+  const [pausado, setPausado] = useState(false);
+  const alternarRef = useRef<() => void>(() => {});
   const legendasRef = useRef<Array<HTMLParagraphElement | null>>([]);
 
   useEffect(() => {
@@ -178,11 +181,14 @@ export function MotionRestricoes() {
     let raf = 0;
     let rodando = false;
     let anterior = 0;
+    let visivel = false; // o palco está na tela?
+    let pausadoUsuario = reduzir; // quem pediu para parar (ou prefere menos movimento)
+    let vazaoMostrada = 0; // número suavizado, para não "tremer" na tela
 
     const dimensionar = () => {
       cw = raiz.clientWidth;
       vertical = cw < 640;
-      ch = vertical ? Math.round(130 + L * 0.4 + 130) : Math.round(Math.min(640, Math.max(380, cw * 0.46)));
+      ch = vertical ? Math.round(130 + L * 0.4 + 180) : Math.round(Math.min(640, Math.max(380, cw * 0.46)));
       raiz.style.height = `${ch}px`;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(cw * dpr);
@@ -369,7 +375,8 @@ export function MotionRestricoes() {
       // textos do DOM: legendas e contador
       if (hudRef.current) hudRef.current.style.opacity = String(s.t < 20 ? suave(0, 1.2, s.t) : 1 - suave(38.4, 39.8, s.t));
       if (saidaRef.current) saidaRef.current.textContent = s.saida.toLocaleString("pt-BR");
-      if (vazaoRef.current) vazaoRef.current.textContent = Math.round(sim.vazao()).toLocaleString("pt-BR");
+      vazaoMostrada += (sim.vazao() - vazaoMostrada) * 0.06;
+      if (vazaoRef.current) vazaoRef.current.textContent = Math.round(vazaoMostrada).toLocaleString("pt-BR");
       LEGENDAS.forEach((l, i) => {
         const el = legendasRef.current[i];
         if (!el) return;
@@ -390,7 +397,7 @@ export function MotionRestricoes() {
       raf = requestAnimationFrame(quadro);
     };
     const tocar = () => {
-      if (rodando || reduzir) return;
+      if (rodando) return;
       rodando = true;
       anterior = performance.now();
       raf = requestAnimationFrame(quadro);
@@ -398,6 +405,11 @@ export function MotionRestricoes() {
     const pausar = () => {
       rodando = false;
       cancelAnimationFrame(raf);
+    };
+    // toca só se estiver na tela e ninguém tiver pausado
+    const atualizar = () => {
+      if (visivel && !pausadoUsuario) tocar();
+      else pausar();
     };
 
     dimensionar();
@@ -408,6 +420,7 @@ export function MotionRestricoes() {
       for (let k = 0; k < 60 * 6; k++) sim.passo(1 / 60);
     }
     ovelha.onload = desenhar;
+    vazaoMostrada = sim.vazao();
     desenhar();
 
     const ro = new ResizeObserver(() => {
@@ -417,12 +430,18 @@ export function MotionRestricoes() {
     ro.observe(raiz);
     const io = new IntersectionObserver(
       ([e]) => {
-        if (e?.isIntersecting) tocar();
-        else pausar();
+        visivel = !!e?.isIntersecting;
+        atualizar();
       },
       { threshold: 0.05 },
     );
     io.observe(raiz);
+    setPausado(reduzir);
+    alternarRef.current = () => {
+      pausadoUsuario = !pausadoUsuario;
+      setPausado(pausadoUsuario);
+      atualizar();
+    };
 
     if (import.meta.env.DEV) {
       (window as unknown as Record<string, unknown>)["__toc"] = {
@@ -439,6 +458,7 @@ export function MotionRestricoes() {
           sim.s.saidas = [];
           sim.s.relogio = 0;
           while (sim.s.t < alvo) sim.passo(1 / 60);
+          vazaoMostrada = sim.vazao();
           desenhar();
         },
         estado: () => ({ t: sim.s.t, bolas: sim.s.bolas.length, saida: sim.s.saida, vazao: sim.vazao(), w: sim.s.w.map((x) => Math.round(x)) }),
@@ -453,56 +473,77 @@ export function MotionRestricoes() {
   }, []);
 
   return (
-    <div
-      ref={raizRef}
-      role="img"
-      aria-label="Animação em loop da Teoria das Restrições: bolinhas amarelas fluem por um tubo de seis zonas. A zona mais estreita limita a saída. Ampliar as outras só acumula bolinhas antes dela; ao ampliar a restrição, o fluxo aumenta e surge a próxima restrição."
-      className="relative mx-auto h-[420px] w-full max-w-[1920px]"
-      style={{
-        WebkitMaskImage:
-          "linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent)",
-        maskImage:
-          "linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent)",
-        WebkitMaskComposite: "source-in",
-        maskComposite: "intersect",
-      }}
-    >
-      <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
+    <div ref={raizRef} className="relative mx-auto h-[420px] w-full max-w-[1920px]">
+      <div
+        role="img"
+        aria-label="Animação em loop da Teoria das Restrições: bolinhas amarelas fluem por um tubo de seis zonas. A zona mais estreita limita a saída. Ampliar as outras só acumula bolinhas antes dela; ao ampliar a restrição, o fluxo aumenta e surge a próxima restrição."
+        className="absolute inset-0"
+      >
+        {/* só o desenho do tubo se dissolve nas bordas; os textos ficam inteiros e legíveis */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent)",
+            maskImage:
+              "linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent)",
+            WebkitMaskComposite: "source-in",
+            maskComposite: "intersect",
+          }}
+        >
+          <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+        </div>
 
-      <div ref={hudRef} aria-hidden="true" className="pointer-events-none absolute bottom-[4%] right-[12%] text-right">
-        <p className="text-[clamp(10px,1vw,14px)] font-semibold uppercase tracking-[0.25em] text-paper/50">Saída</p>
-        <p className="text-[clamp(26px,3.4vw,52px)] font-extrabold leading-none text-accent drop-shadow-[0_0_18px_rgba(253,202,10,0.45)]">
-          <span ref={saidaRef}>0</span>
-        </p>
-        <p className="mt-1 text-[clamp(10px,0.95vw,13px)] text-paper/55">
-          <span ref={vazaoRef}>0</span> bolinhas por segundo
-        </p>
-      </div>
+        {/* legenda que explica o fluxo: é ela que torna a animação compreensível */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[2.5%] px-5 text-center">
+          <div className="relative mx-auto h-[3.4em] max-w-4xl text-[clamp(18px,2.3vw,34px)] leading-tight">
+            {LEGENDAS.map((l, i) => (
+              <p
+                key={i}
+                ref={(el) => {
+                  legendasRef.current[i] = el;
+                }}
+                style={{ opacity: 0 }}
+                className="absolute inset-x-0 font-extrabold uppercase tracking-tight text-white [text-shadow:0_2px_20px_rgba(0,0,0,0.95)] [text-wrap:balance]"
+              >
+                {l.partes.map((p, j) =>
+                  p.destaque ? (
+                    <span key={j} className="font-serif text-[1.12em] font-normal normal-case italic text-accent">
+                      {p.t}
+                    </span>
+                  ) : (
+                    <span key={j}>{p.t}</span>
+                  ),
+                )}
+              </p>
+            ))}
+          </div>
+        </div>
 
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[2.5%] px-6 text-center">
-        <div className="relative mx-auto h-[3.1em] max-w-3xl text-[clamp(14px,1.6vw,24px)] leading-tight">
-          {LEGENDAS.map((l, i) => (
-            <p
-              key={i}
-              ref={(el) => {
-                legendasRef.current[i] = el;
-              }}
-              style={{ opacity: 0 }}
-              className="absolute inset-x-0 font-extrabold uppercase tracking-tight text-paper"
-            >
-              {l.partes.map((p, j) =>
-                p.destaque ? (
-                  <span key={j} className="font-serif font-normal normal-case italic text-accent">
-                    {p.t}
-                  </span>
-                ) : (
-                  <span key={j}>{p.t}</span>
-                ),
-              )}
-            </p>
-          ))}
+        {/* o destaque é a vazão (bolinhas por segundo); o total acumulado fica em segundo plano */}
+        <div ref={hudRef} aria-hidden="true" className="pointer-events-none absolute bottom-[3%] right-[17%] text-right">
+          <p className="text-[clamp(38px,5.2vw,78px)] font-extrabold leading-none text-accent drop-shadow-[0_0_22px_rgba(253,202,10,0.5)]">
+            <span ref={vazaoRef}>0</span>
+          </p>
+          <p className="mt-1 text-[clamp(11px,1.15vw,17px)] font-bold uppercase tracking-[0.18em] text-white">
+            bolinhas por segundo
+          </p>
+          <p className="mt-2 text-[clamp(11px,1vw,14px)] text-paper/60">
+            Total na saída: <span ref={saidaRef}>0</span>
+          </p>
         </div>
       </div>
+
+      {/* controle de acessibilidade: o movimento roda sozinho e precisa poder ser pausado */}
+      <button
+        type="button"
+        onClick={() => alternarRef.current()}
+        aria-label={pausado ? "Reproduzir a animação" : "Pausar a animação"}
+        className="absolute bottom-[3%] left-[4%] z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-paper backdrop-blur transition hover:bg-white/20 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      >
+        {pausado ? <Play size={18} aria-hidden="true" /> : <Pause size={18} aria-hidden="true" />}
+      </button>
     </div>
   );
 }
