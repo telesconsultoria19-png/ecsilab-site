@@ -1,6 +1,7 @@
 import { Check, Minus, Plus } from "lucide-react";
 
 import { EnergyFlow } from "@/components/energy-flow";
+import { MotionDepartamentos } from "@/components/motion-departamentos";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Eyebrow, GlowCard, Section, SectionHead } from "@/components/ui-bits";
@@ -29,27 +30,32 @@ function Hero() {
       <div aria-hidden="true" className="tech-grid pointer-events-none absolute inset-0" />
       <EnergyFlow className="opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)]" />
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-20 sm:px-6 sm:pb-28 sm:pt-28">
-        <Eyebrow>Écsilab Enterprise</Eyebrow>
-        <h1 className="max-w-5xl text-4xl font-extrabold leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
-          Departamentos inteiros operando com IA.{" "}
-          <span className="shimmer-text">A infraestrutura é sua, para sempre.</span>
-        </h1>
-        <p className="mt-8 max-w-3xl text-lg leading-relaxed text-paper/80 sm:text-xl">
-          Projetamos, construímos e deixamos rodando a automação de departamentos inteiros da sua
-          empresa. Não é assinatura: é infraestrutura própria, em nome da sua empresa, sem mensalidade
-          nossa para continuar funcionando.
-        </p>
+        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6">
+          <div>
+          <Eyebrow>Écsilab Enterprise</Eyebrow>
+          <h1 className="max-w-5xl text-4xl font-extrabold leading-[1.04] tracking-tight sm:text-5xl xl:text-6xl">
+            Departamentos inteiros operando com IA.{" "}
+            <span className="shimmer-text">A infraestrutura é sua, para sempre.</span>
+          </h1>
+          <p className="mt-8 max-w-3xl text-lg leading-relaxed text-paper/80 sm:text-xl">
+            Projetamos, construímos e deixamos rodando a automação de departamentos inteiros da sua
+            empresa. Não é assinatura: é infraestrutura própria, em nome da sua empresa, sem mensalidade
+            nossa para continuar funcionando.
+          </p>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <a href={linkWhatsApp(MSG_GERAL)} target="_blank" rel="noopener noreferrer" className={BOTAO_PRIMARIO}>
-            Falar no WhatsApp
-          </a>
-          <a
-            href="#departamentos"
-            className="rounded-xl bg-white/[0.06] px-7 py-4 text-center font-semibold text-paper backdrop-blur transition hover:bg-white/10 hover:text-accent"
-          >
-            Ver os departamentos
-          </a>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <a href={linkWhatsApp(MSG_GERAL)} target="_blank" rel="noopener noreferrer" className={BOTAO_PRIMARIO}>
+              Falar no WhatsApp
+            </a>
+            <a
+              href="#departamentos"
+              className="rounded-xl bg-white/[0.06] px-7 py-4 text-center font-semibold text-paper backdrop-blur transition hover:bg-white/10 hover:text-accent"
+            >
+              Ver os departamentos
+            </a>
+          </div>
+          </div>
+          <MotionDepartamentos />
         </div>
 
         <ul className="mt-14 grid gap-3 text-sm text-paper/85 sm:grid-cols-2 lg:grid-cols-4">
