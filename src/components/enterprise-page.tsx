@@ -1,6 +1,6 @@
 import { Check, Minus, Plus } from "lucide-react";
+import { useLayoutEffect, useRef, useState } from "react";
 
-import { EnergyFlow } from "@/components/energy-flow";
 import { MotionDepartamentos } from "@/components/motion-departamentos";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -24,41 +24,180 @@ const msgDepartamento = (nome: string) =>
 
 const BOTAO_PRIMARIO = "btn-neon rounded-xl bg-accent px-7 py-4 text-center font-semibold text-ink";
 
+const TEXTO_HERO =
+  "Projetamos, construímos e deixamos rodando a automação de departamentos inteiros da sua empresa. Não é assinatura: é infraestrutura própria, em nome da sua empresa, sem mensalidade nossa para continuar funcionando.";
+
+const reduzMovimento = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * Abertura da hero: o título entra em blocos, grande e centralizado; depois vai para a esquerda, a animação dos
+ * departamentos começa à direita e o parágrafo é escrito. O HTML do servidor já traz tudo no estado final
+ * (sem JavaScript, ou com "reduzir movimento", nada se move).
+ */
 function Hero() {
+  const secaoRef = useRef<HTMLElement>(null);
+  const blocosRef = useRef<Array<HTMLSpanElement | null>>([]);
+  const [fase, setFase] = useState<"final" | "titulo" | "escrevendo">("final");
+  const [escrito, setEscrito] = useState(TEXTO_HERO.length);
+  const [animacao, setAnimacao] = useState(true);
+
+  useLayoutEffect(() => {
+    if (reduzMovimento()) return;
+    const secao = secaoRef.current;
+    const blocos = blocosRef.current.filter((b): b is HTMLSpanElement => !!b);
+    if (!secao || blocos.length === 0) return;
+    setFase("titulo");
+    setEscrito(0);
+    setAnimacao(false);
+    blocos.forEach((b) => {
+      b.style.transition = "none";
+      b.style.opacity = "0";
+    });
+
+    const timers: number[] = [];
+    const em = (ms: number, f: () => void) => timers.push(window.setTimeout(f, ms));
+    let cancelado = false;
+    const iniciar = () => {
+      if (cancelado) return;
+      // posição inicial de cada bloco: grande e empilhado no centro da seção
+      const rs = secao.getBoundingClientRect();
+      const alvos = blocos.map((b) => b.getBoundingClientRect());
+      const maior = Math.max(...alvos.map((r) => r.width));
+      const escala = Math.min(1.45, (rs.width - 32) / maior);
+      const alturas = alvos.map((r) => r.height * escala);
+      const total = alturas.reduce((a, b) => a + b, 0);
+      const topo = Math.max(rs.top, 64);
+      const base = Math.min(rs.bottom, window.innerHeight);
+      let y = (topo + base) / 2 - total / 2;
+      blocos.forEach((b, i) => {
+        const r = alvos[i];
+        const h = alturas[i];
+        if (!r || h === undefined) return;
+        const dx = rs.left + rs.width / 2 - (r.left + r.width / 2);
+        const dy = y + h / 2 - (r.top + r.height / 2);
+        y += h;
+        b.style.transition = "none";
+        b.style.transform = `translate(${dx}px, ${dy}px) scale(${escala})`;
+        b.style.opacity = "0";
+        b.style.filter = "blur(10px)";
+      });
+      secao.getBoundingClientRect(); // força o layout antes de ligar as transições
+
+      blocos.forEach((b, i) => {
+        em(250 + i * 750, () => {
+          b.style.transition = "opacity .8s ease, filter .8s ease";
+          b.style.opacity = "1";
+          b.style.filter = "blur(0)";
+        });
+      });
+      const T_MOVE = 250 + blocos.length * 750 + 1100;
+      em(T_MOVE, () => {
+        blocos.forEach((b) => {
+          b.style.transition = "transform 1.1s cubic-bezier(.7,0,.2,1)";
+          b.style.transform = "none";
+        });
+      });
+      em(T_MOVE + 900, () => {
+        setFase("escrevendo");
+        setAnimacao(true);
+        let n = 0;
+        const id = window.setInterval(() => {
+          n += 2;
+          setEscrito(Math.min(n, TEXTO_HERO.length));
+          if (n >= TEXTO_HERO.length) window.clearInterval(id);
+        }, 26);
+        timers.push(id);
+      });
+    };
+    // espera fontes e estilos assentarem antes de medir
+    const fontes = document.fonts?.ready ?? Promise.resolve();
+    Promise.race([fontes, new Promise((r) => setTimeout(r, 900))]).then(() => em(80, iniciar));
+    return () => {
+      cancelado = true;
+      timers.forEach((t) => (window.clearTimeout(t), window.clearInterval(t)));
+    };
+  }, []);
+
+  const pronto = escrito >= TEXTO_HERO.length;
+  const revela = `transition-all duration-1000 ${pronto ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"}`;
+  const bloco = "block w-fit max-w-full will-change-transform";
+
   return (
-    <section className="relative overflow-hidden">
-      <div aria-hidden="true" className="tech-grid pointer-events-none absolute inset-0" />
-      <EnergyFlow className="opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)]" />
+    <section ref={secaoRef} className="ardosia relative overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-ink"
+      />
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-20 sm:px-6 sm:pb-28 sm:pt-28">
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6">
           <div>
-          <Eyebrow>Écsilab Enterprise</Eyebrow>
-          <h1 className="max-w-5xl text-4xl font-extrabold leading-[1.04] tracking-tight sm:text-5xl xl:text-6xl">
-            Departamentos inteiros operando com IA.{" "}
-            <span className="shimmer-text">A infraestrutura é sua, para sempre.</span>
-          </h1>
-          <p className="mt-8 max-w-3xl text-lg leading-relaxed text-paper/80 sm:text-xl">
-            Projetamos, construímos e deixamos rodando a automação de departamentos inteiros da sua
-            empresa. Não é assinatura: é infraestrutura própria, em nome da sua empresa, sem mensalidade
-            nossa para continuar funcionando.
-          </p>
-
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <a href={linkWhatsApp(MSG_GERAL)} target="_blank" rel="noopener noreferrer" className={BOTAO_PRIMARIO}>
-              Falar no WhatsApp
-            </a>
-            <a
-              href="#departamentos"
-              className="rounded-xl bg-white/[0.06] px-7 py-4 text-center font-semibold text-paper backdrop-blur transition hover:bg-white/10 hover:text-accent"
+            <div
+              className={`transition-opacity duration-700 ${fase === "titulo" ? "opacity-0" : "opacity-100"}`}
             >
-              Ver os departamentos
-            </a>
+              <Eyebrow>Écsilab Enterprise</Eyebrow>
+            </div>
+            <h1 className="max-w-5xl text-4xl font-extrabold leading-[1.04] tracking-tight sm:text-5xl xl:text-6xl">
+              <span
+                ref={(el) => {
+                  blocosRef.current[0] = el;
+                }}
+                className={bloco}
+              >
+                Departamentos inteiros operando com IA.
+              </span>
+              <span
+                ref={(el) => {
+                  blocosRef.current[1] = el;
+                }}
+                className={`${bloco} shimmer-text`}
+              >
+                A infraestrutura é sua,
+              </span>
+              <span
+                ref={(el) => {
+                  blocosRef.current[2] = el;
+                }}
+                className={`${bloco} shimmer-text`}
+              >
+                para sempre.
+              </span>
+            </h1>
+            <p className="mt-8 max-w-3xl text-lg leading-relaxed text-paper/80 sm:text-xl">
+              <span className="relative block">
+                <span className="opacity-0">{TEXTO_HERO}</span>
+                <span aria-hidden="true" className="absolute inset-0">
+                  {TEXTO_HERO.slice(0, escrito)}
+                  {!pronto && escrito > 0 && (
+                    <span className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] bg-accent" />
+                  )}
+                </span>
+              </span>
+            </p>
+
+            <div className={`mt-10 flex flex-col gap-3 sm:flex-row ${revela}`}>
+              <a
+                href={linkWhatsApp(MSG_GERAL)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={BOTAO_PRIMARIO}
+              >
+                Falar no WhatsApp
+              </a>
+              <a
+                href="#departamentos"
+                className="rounded-xl bg-white/[0.06] px-7 py-4 text-center font-semibold text-paper backdrop-blur transition hover:bg-white/10 hover:text-accent"
+              >
+                Ver os departamentos
+              </a>
+            </div>
           </div>
-          </div>
-          <MotionDepartamentos />
+          <MotionDepartamentos ativo={animacao} />
         </div>
 
-        <ul className="mt-14 grid gap-3 text-sm text-paper/85 sm:grid-cols-2 lg:grid-cols-4">
+        <ul
+          className={`mt-14 grid gap-3 text-sm text-paper/85 sm:grid-cols-2 lg:grid-cols-4 ${revela}`}
+        >
           {[
             "Implantação sob medida",
             "Pagamento único por projeto",
@@ -93,7 +232,9 @@ function Comparativo() {
       {/* telas grandes: tabela */}
       <div className="reveal hidden md:block">
         <table className="w-full border-separate border-spacing-y-3 text-left">
-          <caption className="sr-only">Comparação entre assinatura de software e infraestrutura própria</caption>
+          <caption className="sr-only">
+            Comparação entre assinatura de software e infraestrutura própria
+          </caption>
           <thead>
             <tr className="text-sm uppercase tracking-[0.18em]">
               <th scope="col" className="w-[24%] px-5 pb-1 font-semibold text-paper/50">
@@ -110,7 +251,10 @@ function Comparativo() {
           <tbody>
             {COMPARATIVO.map((l) => (
               <tr key={l.tema} className="text-lg">
-                <th scope="row" className="rounded-l-2xl bg-white/[0.04] px-5 py-5 font-semibold text-paper">
+                <th
+                  scope="row"
+                  className="rounded-l-2xl bg-white/[0.04] px-5 py-5 font-semibold text-paper"
+                >
                   {l.tema}
                 </th>
                 <td className="bg-white/[0.04] px-5 py-5 text-paper/60">{l.assinatura}</td>
@@ -127,7 +271,9 @@ function Comparativo() {
       <div className="grid gap-4 md:hidden">
         {COMPARATIVO.map((l) => (
           <GlowCard key={l.tema} as="article" className="p-6">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-paper/60">{l.tema}</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-paper/60">
+              {l.tema}
+            </h3>
             <p className="mt-4 flex gap-3 text-paper/60">
               <Minus size={18} className="mt-1 shrink-0" aria-hidden="true" />
               <span>
@@ -147,8 +293,8 @@ function Comparativo() {
       </div>
 
       <p className="reveal mt-8 max-w-3xl text-sm text-paper/60">
-        Os custos de infraestrutura e de APIs de terceiros continuam existindo, mas são pagos por você
-        diretamente aos provedores, em contas da sua empresa.
+        Os custos de infraestrutura e de APIs de terceiros continuam existindo, mas são pagos por
+        você diretamente aos provedores, em contas da sua empresa.
       </p>
     </Section>
   );
@@ -269,7 +415,9 @@ function Propriedade() {
       />
       <div className="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
         <GlowCard className="p-8">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">Fica com a sua empresa</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
+            Fica com a sua empresa
+          </h3>
           <ul className="mt-6 space-y-4 text-lg">
             {FICA_COM_VOCE.map((t) => (
               <li key={t} className="flex gap-3">
@@ -280,7 +428,9 @@ function Propriedade() {
           </ul>
         </GlowCard>
         <GlowCard className="p-8">
-          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-paper/60">Fora do projeto</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-paper/60">
+            Fora do projeto
+          </h3>
           <ul className="mt-6 space-y-4 text-paper/80">
             {FORA_DO_PROJETO.map((t) => (
               <li key={t} className="flex gap-3">
@@ -351,11 +501,16 @@ function ChamadaFinal() {
           Qual departamento da sua empresa pesa mais hoje?
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-paper/75">
-          Conte o seu cenário. A conversa é direta, no WhatsApp, com a liderança da Écsilab, e termina
-          em uma proposta para o seu departamento.
+          Conte o seu cenário. A conversa é direta, no WhatsApp, com a liderança da Écsilab, e
+          termina em uma proposta para o seu departamento.
         </p>
         <div className="mt-10 flex justify-center">
-          <a href={linkWhatsApp(MSG_GERAL)} target="_blank" rel="noopener noreferrer" className={BOTAO_PRIMARIO}>
+          <a
+            href={linkWhatsApp(MSG_GERAL)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={BOTAO_PRIMARIO}
+          >
             Falar no WhatsApp
           </a>
         </div>

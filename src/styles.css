@@ -227,3 +227,15 @@ section[id] {
   .node-dot { opacity: 1; transition: none; }
   .eyebrow-line { animation: none; }
 }
+
+/* Ardósia: pedra preta com granulação fina e manchas suaves, só com CSS (sem imagem pesada) */
+.ardosia {
+  background-color: #0b0b0c;
+  background-image:
+    radial-gradient(ellipse 55% 45% at 82% 8%, rgba(255, 255, 255, 0.075), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 8% 95%, rgba(253, 202, 10, 0.045), transparent 70%),
+    radial-gradient(ellipse 35% 30% at 30% 40%, rgba(255, 255, 255, 0.03), transparent 70%),
+    radial-gradient(ellipse 40% 35% at 65% 75%, rgba(255, 255, 255, 0.025), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: auto, auto, auto, auto, 240px 240px;
+}

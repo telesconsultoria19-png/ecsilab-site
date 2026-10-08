@@ -125,7 +125,7 @@ type Legenda = { partes: Array<{ t: string; d?: boolean }>; ini: number; fim: nu
 const legendasDoCiclo = (ciclo: number): Legenda[] =>
   ciclo === 0
     ? [
-        { partes: [{ t: "A Écsilab " }, { t: "constrói.", d: true }], ini: 0.3, fim: 7.3 },
+        { partes: [{ t: "A Écsilab " }, { t: "tece.", d: true }], ini: 0.3, fim: 7.3 },
         { partes: [{ t: "E deixa " }, { t: "rodando.", d: true }], ini: 7.7, fim: 12.5 },
         { partes: [{ t: "Em nome da " }, { t: "sua empresa.", d: true }], ini: 12.9, fim: 16 },
       ]
@@ -209,12 +209,18 @@ function criarSim() {
   return { s, passo };
 }
 
-export function MotionDepartamentos() {
+export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
   const palcoRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const legendasRef = useRef<Array<HTMLParagraphElement | null>>([]);
   const [pausado, setPausado] = useState(false);
   const alternarRef = useRef<() => void>(() => {});
+  const ativoRef = useRef(ativo);
+  const atualizarRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    ativoRef.current = ativo;
+    atualizarRef.current();
+  }, [ativo]);
 
   useEffect(() => {
     const palco = palcoRef.current;
@@ -287,26 +293,66 @@ export function MotionDepartamentos() {
       rotulos = [];
 
       // ---- fios ----
+      // fio de lã: duas pontas trançadas em torno do caminho
       const fio = (pts: Ponto2[], prog: number, forte: number) => {
         if (prog <= 0) return;
-        ctx.beginPath();
         const n = Math.max(2, Math.round(prog * pts.length));
-        for (let k = 0; k < n; k++) {
-          const p = pts[k];
-          if (!p) continue;
-          if (k === 0) ctx.moveTo(X(p[0]), X(p[1]));
-          else ctx.lineTo(X(p[0]), X(p[1]));
+        ctx.lineWidth = Math.max(1.2, X(3));
+        for (const [fase, alfa] of [
+          [0, 0.5],
+          [Math.PI, 0.36],
+        ] as const) {
+          ctx.beginPath();
+          for (let k = 0; k < n; k++) {
+            const p = pts[k];
+            const a0 = pts[Math.max(0, k - 1)];
+            const a1 = pts[Math.min(pts.length - 1, k + 1)];
+            if (!p || !a0 || !a1) continue;
+            const dx = a1[0] - a0[0];
+            const dy = a1[1] - a0[1];
+            const len = Math.hypot(dx, dy) || 1;
+            const off = Math.sin(k * 0.75 + fase) * 4.5;
+            const x = X(p[0] - (dy / len) * off);
+            const y = X(p[1] + (dx / len) * off);
+            if (k === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `rgba(${AMARELO},${alfa + 0.3 * forte})`;
+          ctx.stroke();
         }
-        ctx.strokeStyle = `rgba(${AMARELO},${0.16 + 0.22 * forte})`;
-        ctx.lineWidth = Math.max(1, X(2.2));
+      };
+      /** Novelo de lã: bola amarela com voltas de fio por cima. */
+      const novelo = (x: number, y: number, r: number, k: number) => {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${AMARELO},${0.95 * k})`;
+        ctx.fill();
+        if (k > 0.4) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.strokeStyle = "rgba(0,0,0,0.42)";
+          ctx.lineWidth = Math.max(1, r * 0.1);
+          for (const rot of [0.5, -0.7, 1.6]) {
+            ctx.beginPath();
+            ctx.ellipse(x, y, r * 1.15, r * 0.5, rot, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+        ctx.lineWidth = Math.max(1.2, X(2.4));
+        ctx.strokeStyle = k > 0.5 ? `rgba(${AMARELO},1)` : "rgba(255,255,255,0.3)";
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.stroke();
       };
       for (let i = 0; i < N; i++) {
         const pts: Ponto2[] = [];
-        for (let k = 0; k <= 20; k++) pts.push(raio(i, k / 20));
+        for (let k = 0; k <= 40; k++) pts.push(raio(i, k / 40));
         fio(pts, rede.raioProg[i] ?? 0, s.brilho[i] ?? 0);
         const pa: Ponto2[] = [];
-        for (let k = 0; k <= 24; k++) pa.push(anel(i, k / 24));
+        for (let k = 0; k <= 40; k++) pa.push(anel(i, k / 40));
         fio(pa, rede.anelProg[i] ?? 0, Math.max(s.brilho[i] ?? 0, s.brilho[(i + 1) % N] ?? 0));
       }
 
@@ -335,7 +381,7 @@ export function MotionDepartamentos() {
       {
         const k = rede.nucleo;
         const pulso = 0.5 + 0.5 * Math.sin(s.t * 2);
-        const r = X(34) * (0.9 + 0.1 * k);
+        const r = X(36) * (0.9 + 0.1 * k);
         if (k > 0.02) {
           const g = ctx.createRadialGradient(X(CX), X(CY), 0, X(CX), X(CY), X(120));
           g.addColorStop(0, `rgba(${AMARELO},${(0.2 + 0.1 * pulso + 0.35 * (s.brilho[N] ?? 0)) * k})`);
@@ -343,13 +389,7 @@ export function MotionDepartamentos() {
           ctx.fillStyle = g;
           ctx.fillRect(X(CX - 120), X(CY - 120), X(240), X(240));
         }
-        ctx.beginPath();
-        ctx.arc(X(CX), X(CY), r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${AMARELO},${0.95 * k})`;
-        ctx.fill();
-        ctx.lineWidth = Math.max(1.4, X(3));
-        ctx.strokeStyle = k > 0.5 ? `rgba(${AMARELO},1)` : "rgba(255,255,255,0.38)";
-        ctx.stroke();
+        novelo(X(CX), X(CY), r, k);
         const fs = Math.max(10, X(23));
         texto("SUA EMPRESA", X(CX), X(CY) + r + fs * 1.1, fs, k > 0.5 ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)", "center", 700);
       }
@@ -360,7 +400,7 @@ export function MotionDepartamentos() {
         const [nx, ny] = noPos(i);
         const k = rede.aceso[i] ?? 0;
         const amp = ov && ciclo > 0 && departamentoAmpliado(ciclo) === i ? ov.ampliando : 0;
-        const r = X(15) * (0.55 + 0.45 * k) + X(5) * (s.brilho[i] ?? 0) + X(4) * amp;
+        const r = X(17) * (0.55 + 0.45 * k) + X(5) * (s.brilho[i] ?? 0) + X(4) * amp;
         if (k > 0.02 || amp > 0) {
           const g = ctx.createRadialGradient(X(nx), X(ny), 0, X(nx), X(ny), X(52 + 30 * amp));
           g.addColorStop(0, `rgba(${AMARELO},${(0.28 * k + 0.4 * (s.brilho[i] ?? 0) + 0.45 * amp)})`);
@@ -379,13 +419,7 @@ export function MotionDepartamentos() {
             ctx.stroke();
           }
         }
-        ctx.beginPath();
-        ctx.arc(X(nx), X(ny), r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${AMARELO},${0.95 * k})`;
-        ctx.fill();
-        ctx.lineWidth = Math.max(1.2, X(2.4));
-        ctx.strokeStyle = k > 0.5 ? `rgba(${AMARELO},1)` : "rgba(255,255,255,0.3)";
-        ctx.stroke();
+        novelo(X(nx), X(ny), r, k);
 
         // nome do departamento, em até duas linhas, do lado de fora do anel
         const palavras = (DEPARTAMENTOS[i] ?? "").split(" ");
@@ -460,10 +494,11 @@ export function MotionDepartamentos() {
       cancelAnimationFrame(raf);
     };
     const atualizar = () => {
-      if (visivel && !pausadoUsuario) tocar();
+      if (visivel && ativoRef.current && !pausadoUsuario) tocar();
       else pausar();
     };
 
+    atualizarRef.current = atualizar;
     dimensionar();
     // primeira imagem: com "reduzir movimento", um quadro fixo da rede já pronta; sem isso, a abertura (ciclo 0)
     if (reduzir) {
@@ -526,8 +561,8 @@ export function MotionDepartamentos() {
       <div
         ref={palcoRef}
         role="img"
-        aria-label="Animação em loop: a Écsilab liga dez departamentos (vendas, marketing, atendimento e CS, financeiro, RH, conteúdo, jurídico, imobiliário, saúde e estética e e-commerce) a um núcleo que é a sua empresa. Depois a Écsilab sai de cena e a rede segue funcionando sozinha, em nome da sua empresa."
-        className="relative aspect-square w-full"
+        aria-label="Animação em loop: a Écsilab tece um fio de lã ligando dez departamentos (vendas, marketing, atendimento e CS, financeiro, RH, conteúdo, jurídico, imobiliário, saúde e estética e e-commerce) a um núcleo que é a sua empresa. Depois a Écsilab sai de cena e a rede segue funcionando sozinha, em nome da sua empresa."
+        className={`relative aspect-square w-full transition-opacity duration-1000 ${ativo ? "opacity-100" : "opacity-0"}`}
       >
         <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
 
