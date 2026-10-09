@@ -95,7 +95,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
       const raioOnda = fase < 1 ? fase * S * 0.62 : -1;
       const raioMouse = Math.max(48, S * 0.13);
 
-      const tam = Math.max(1.1, S / 250);
+      const tam = Math.max(0.85, S / 480);
       for (let i = 0; i < n; i++) {
         const a = ang[i]!;
         const q = rnd[i]!;
@@ -147,7 +147,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
         const amarela = tipo[i] === 1;
         const alfa = Math.min(
           1,
-          (((amarela ? 0.85 : 0.62) + q * 0.3 + brilho * 0.5) * e + 0.22 * (1 - e)) * (1 - disp),
+          (((amarela ? 0.95 : 0.82) + q * 0.2 + brilho * 0.5) * e + 0.22 * (1 - e)) * (1 - disp),
         );
         if (alfa <= 0.01) continue;
         ctx.fillStyle = `rgba(${amarela ? AMARELO : BRANCO},${alfa})`;
@@ -197,18 +197,18 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
         if (mc) {
           mc.fillStyle = "#000";
           mc.strokeStyle = "#000";
-          mc.lineWidth = 2.2;
+          mc.lineWidth = 1.4;
           mc.textAlign = "center";
           mc.textBaseline = "middle";
-          mc.font = `800 ${d.h * 0.056}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
+          mc.font = `800 ${d.h * 0.05}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
           try {
             (mc as unknown as { letterSpacing: string }).letterSpacing = `${d.h * 0.012}px`;
           } catch {
             /* sem suporte a espaçamento entre letras */
           }
           for (const [txt, fy] of [
-            ["BLACK", 0.762],
-            ["SHEEP", 0.822],
+            ["BLACK", 0.752],
+            ["SHEEP", 0.806],
           ] as const) {
             mc.fillText(txt, d.w * 0.5, d.h * fy);
             mc.strokeText(txt, d.w * 0.5, d.h * fy);
