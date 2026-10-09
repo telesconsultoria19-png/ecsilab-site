@@ -197,10 +197,10 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
         if (mc) {
           mc.fillStyle = "#000";
           mc.strokeStyle = "#000";
-          mc.lineWidth = 1.4;
+          mc.lineWidth = 0.5;
           mc.textAlign = "center";
           mc.textBaseline = "middle";
-          mc.font = `800 ${d.h * 0.05}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
+          mc.font = `500 ${d.h * 0.05}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
           try {
             (mc as unknown as { letterSpacing: string }).letterSpacing = `${d.h * 0.012}px`;
           } catch {
