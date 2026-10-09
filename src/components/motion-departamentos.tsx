@@ -141,8 +141,9 @@ type Aresta = {
 };
 const ARESTAS: Aresta[] = (() => {
   const r = semente(13);
+  // as linhas de conexão não têm ramos laterais: os dendritos ficam só nos corpos (empresa e departamentos)
   const colaterais = (): Colateral[] =>
-    Array.from({ length: 2 }, (_, q) => ({
+    Array.from({ length: 0 }, (_, q) => ({
       s: 0.22 + q * 0.34 + r() * 0.2,
       lado: r() < 0.5 ? 1 : -1,
       ang: 0.6 + r() * 0.6,
