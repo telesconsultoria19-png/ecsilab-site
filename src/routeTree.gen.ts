@@ -10,8 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ArquitetosRouteImport } from './routes/arquitetos'
 import { Route as EnterpriseRouteImport } from './routes/enterprise'
+import { Route as MentesRouteImport } from './routes/mentes'
 import { Route as PoliticaDePrivacidadeRouteImport } from './routes/politica-de-privacidade'
 import { Route as SolucoesRouteImport } from './routes/solucoes'
 import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
@@ -22,14 +22,14 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArquitetosRoute = ArquitetosRouteImport.update({
-  id: '/arquitetos',
-  path: '/arquitetos',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EnterpriseRoute = EnterpriseRouteImport.update({
   id: '/enterprise',
   path: '/enterprise',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MentesRoute = MentesRouteImport.update({
+  id: '/mentes',
+  path: '/mentes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PoliticaDePrivacidadeRoute = PoliticaDePrivacidadeRouteImport.update({
@@ -55,8 +55,8 @@ const ApiNovoLeadRoute = ApiNovoLeadRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/arquitetos': typeof ArquitetosRoute
   '/enterprise': typeof EnterpriseRoute
+  '/mentes': typeof MentesRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/solucoes': typeof SolucoesRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
@@ -64,8 +64,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/arquitetos': typeof ArquitetosRoute
   '/enterprise': typeof EnterpriseRoute
+  '/mentes': typeof MentesRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/solucoes': typeof SolucoesRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
@@ -74,8 +74,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/arquitetos': typeof ArquitetosRoute
   '/enterprise': typeof EnterpriseRoute
+  '/mentes': typeof MentesRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
   '/solucoes': typeof SolucoesRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
@@ -85,8 +85,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/arquitetos'
     | '/enterprise'
+    | '/mentes'
     | '/politica-de-privacidade'
     | '/solucoes'
     | '/termos-de-uso'
@@ -94,8 +94,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/arquitetos'
     | '/enterprise'
+    | '/mentes'
     | '/politica-de-privacidade'
     | '/solucoes'
     | '/termos-de-uso'
@@ -103,8 +103,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/arquitetos'
     | '/enterprise'
+    | '/mentes'
     | '/politica-de-privacidade'
     | '/solucoes'
     | '/termos-de-uso'
@@ -113,8 +113,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ArquitetosRoute: typeof ArquitetosRoute
   EnterpriseRoute: typeof EnterpriseRoute
+  MentesRoute: typeof MentesRoute
   PoliticaDePrivacidadeRoute: typeof PoliticaDePrivacidadeRoute
   SolucoesRoute: typeof SolucoesRoute
   TermosDeUsoRoute: typeof TermosDeUsoRoute
@@ -130,18 +130,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/arquitetos': {
-      id: '/arquitetos'
-      path: '/arquitetos'
-      fullPath: '/arquitetos'
-      preLoaderRoute: typeof ArquitetosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/enterprise': {
       id: '/enterprise'
       path: '/enterprise'
       fullPath: '/enterprise'
       preLoaderRoute: typeof EnterpriseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mentes': {
+      id: '/mentes'
+      path: '/mentes'
+      fullPath: '/mentes'
+      preLoaderRoute: typeof MentesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/politica-de-privacidade': {
@@ -177,8 +177,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ArquitetosRoute: ArquitetosRoute,
   EnterpriseRoute: EnterpriseRoute,
+  MentesRoute: MentesRoute,
   PoliticaDePrivacidadeRoute: PoliticaDePrivacidadeRoute,
   SolucoesRoute: SolucoesRoute,
   TermosDeUsoRoute: TermosDeUsoRoute,

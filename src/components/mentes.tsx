@@ -37,9 +37,9 @@ const TIME = [
   },
 ];
 
-export function Arquitetos() {
+export function Mentes() {
   return (
-    <Section id="arquitetos">
+    <Section id="mentes">
       <div className="space-y-16 md:space-y-28">
         {TIME.map((s, i) => (
           <article

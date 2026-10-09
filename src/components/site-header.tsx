@@ -5,7 +5,7 @@ import { Menu, X } from "lucide-react";
 const idDe = (href: string) => href.split("#")[1] ?? "";
 
 export const NAV: Array<{ href: string; label: string; pagina?: boolean; destaque?: boolean }> = [
-  { href: "/arquitetos", label: "Arquitetos", pagina: true },
+  { href: "/mentes", label: "Mentes", pagina: true },
   { href: "/#diagnostico", label: "Diagnóstico" },
   { href: "/#metodo", label: "Método" },
   { href: "/solucoes", label: "Soluções", pagina: true },
