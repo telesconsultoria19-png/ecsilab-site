@@ -10,7 +10,7 @@ export function HomeHero() {
         className="tech-grid pointer-events-none absolute inset-0"
         style={{ ["--grade-opacidade" as string]: 0.11 }}
       />
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 px-4 pb-20 pt-16 sm:px-6 sm:pt-24 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1.1fr_0.9fr] lg:gap-6 lg:pb-24 lg:pt-20">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-8 px-4 pb-20 pt-8 sm:px-6 sm:pt-16 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1.1fr_0.9fr] lg:gap-6 lg:pb-24 lg:pt-20">
         <div>
           <Eyebrow>A dura realidade do mercado</Eyebrow>
           <h1 className="text-5xl font-extrabold leading-[1.04] tracking-tight sm:text-6xl lg:text-7xl">
@@ -23,7 +23,7 @@ export function HomeHero() {
             <strong className="font-bold text-accent">AUMENTO DIRETO DE FATURAMENTO</strong>!
           </p>
         </div>
-        <OvelhaParticulas className="mx-auto max-w-[560px]" />
+        <OvelhaParticulas className="order-first mx-auto max-w-[300px] sm:max-w-[420px] lg:order-last lg:max-w-[560px]" />
       </div>
     </section>
   );
