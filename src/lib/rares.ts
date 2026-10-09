@@ -4,7 +4,7 @@
 
 export const RARES_PRONUNCIA = "rá-res";
 /** Nome comercial da versão avançada: troque aqui para mudar em todo o site. */
-export const NOME_AVANCADO = "Rares Apex";
+export const NOME_AVANCADO = "Rares Black";
 
 export const RARES_BASE = [
   {
