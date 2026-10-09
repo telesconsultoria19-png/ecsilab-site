@@ -1,3 +1,4 @@
+import { fluxo, MAX_BOLINHAS } from "@/lib/fluxo-poeira";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -39,7 +40,7 @@ const V = 260; // velocidade livre (unidades por segundo)
 const CICLO = 40;
 const AMARELO = "253,202,10";
 
-type Bola = { u: number; v: number; vel: number };
+type Bola = { id: number; u: number; v: number; vel: number };
 
 function semente(n: number) {
   let a = n >>> 0;
@@ -89,6 +90,7 @@ function criarSim() {
     t: 0,
     w: [...BASE],
     bolas: [] as Bola[],
+    prox: 0,
     acc: 0,
     saida: 0,
     saidas: [] as number[],
@@ -99,7 +101,8 @@ function criarSim() {
     // larguras caminham até o alvo
     const alvo = alvos(s.t);
     const taxa = s.t >= 33.5 ? 0.6 : 1.1;
-    for (let i = 0; i < NZ; i++) s.w[i] = (s.w[i] ?? 0) + ((alvo[i] ?? 0) - (s.w[i] ?? 0)) * (1 - Math.exp(-dt * taxa));
+    for (let i = 0; i < NZ; i++)
+      s.w[i] = (s.w[i] ?? 0) + ((alvo[i] ?? 0) - (s.w[i] ?? 0)) * (1 - Math.exp(-dt * taxa));
 
     // entrada: o ritmo é a capacidade da zona 1. As novas bolinhas nascem alinhadas atrás da entrada,
     // então várias podem entrar no mesmo quadro sem se sobrepor.
@@ -109,7 +112,7 @@ function criarSim() {
       const ultima = s.bolas[s.bolas.length - 1];
       const uNovo = ultima ? Math.min(0, ultima.u - espaco(0, s.w)) : 0;
       if (uNovo < -V * 0.07) break; // fila de entrada cheia: sem espaço
-      s.bolas.push({ u: uNovo, v: (rnd() * 2 - 1) * 0.92, vel: V });
+      s.bolas.push({ id: s.prox++, u: uNovo, v: (rnd() * 2 - 1) * 0.92, vel: V });
       s.acc -= 1;
     }
 
@@ -155,6 +158,7 @@ function criarSim() {
       s.t = 0;
       s.w = [...BASE];
       s.bolas = [];
+      s.prox = 0;
       s.acc = 0;
       s.saida = 0;
       s.saidas.length = 0;
@@ -172,10 +176,26 @@ function criarSim() {
 // ---------- legendas ----------
 type Parte = { t: string; destaque?: boolean };
 const LEGENDAS: Array<{ ini: number; fim: number; partes: Parte[] }> = [
-  { ini: 0, fim: 6, partes: [{ t: "Toda operação tem uma " }, { t: "restrição.", destaque: true }] },
-  { ini: 6, fim: 14.5, partes: [{ t: "Ampliar o que está fora dela só acumula " }, { t: "estoque.", destaque: true }] },
-  { ini: 14.5, fim: 24.5, partes: [{ t: "Ampliar a restrição libera o " }, { t: "fluxo.", destaque: true }] },
-  { ini: 24.5, fim: 33, partes: [{ t: "Aparece a próxima restrição. E a gente " }, { t: "segue.", destaque: true }] },
+  {
+    ini: 0,
+    fim: 6,
+    partes: [{ t: "Toda operação tem uma " }, { t: "restrição.", destaque: true }],
+  },
+  {
+    ini: 6,
+    fim: 14.5,
+    partes: [{ t: "Ampliar o que está fora dela só acumula " }, { t: "estoque.", destaque: true }],
+  },
+  {
+    ini: 14.5,
+    fim: 24.5,
+    partes: [{ t: "Ampliar a restrição libera o " }, { t: "fluxo.", destaque: true }],
+  },
+  {
+    ini: 24.5,
+    fim: 33,
+    partes: [{ t: "Aparece a próxima restrição. E a gente " }, { t: "segue.", destaque: true }],
+  },
   { ini: 33, fim: 40, partes: [{ t: "Uma restrição de cada " }, { t: "vez.", destaque: true }] },
 ];
 
@@ -257,7 +277,8 @@ export function MotionRestricoes() {
     /** Altura da tela "pequena" do aparelho (com a barra do navegador visível), para o palco caber inteiro. */
     const alturaDaTela = () => {
       const m = document.createElement("div");
-      m.style.cssText = "position:fixed;visibility:hidden;pointer-events:none;width:0;height:100svh";
+      m.style.cssText =
+        "position:fixed;visibility:hidden;pointer-events:none;width:0;height:100svh";
       document.body.appendChild(m);
       const h = m.getBoundingClientRect().height;
       m.remove();
@@ -364,16 +385,27 @@ export function MotionRestricoes() {
         { a: 0.7, pts: [] },
         { a: 1, pts: [] },
       ];
+      let nPub = 0;
       for (const b of s.bolas) {
         if (b.u < -2) continue;
         const w = largura(b.u, s.w);
         const p = P(b.u, b.v * Math.max(0, w / 2 - R * 1.1));
         const k = b.vel < V * 0.25 ? 0 : b.vel < V * 0.75 ? 1 : 2;
         faixas[k]?.pts.push(p);
+        // publica a posição para a poeira da hero, que vira estas bolinhas ao rolar a página
+        if (nPub < MAX_BOLINHAS) {
+          fluxo.ids[nPub] = b.id;
+          fluxo.xs[nPub] = p[0];
+          fluxo.ys[nPub] = p[1];
+          nPub++;
+        }
       }
+      fluxo.n = nPub;
       const raio = Math.max(1.5, R * sc);
+      fluxo.raio = raio;
       for (const f of faixas) {
-        ctx.fillStyle = `rgba(${AMARELO},${f.a})`;
+        if (fluxo.vis < 0.01) break;
+        ctx.fillStyle = `rgba(${AMARELO},${f.a * fluxo.vis})`;
         ctx.beginPath();
         for (const [x, y] of f.pts) {
           ctx.moveTo(x + raio, y);
@@ -465,7 +497,10 @@ export function MotionRestricoes() {
       }
 
       // textos do DOM: legendas e contador
-      if (hudRef.current) hudRef.current.style.opacity = String(s.t < 20 ? suave(0, 1.2, s.t) : 1 - suave(38.4, 39.8, s.t));
+      if (hudRef.current)
+        hudRef.current.style.opacity = String(
+          s.t < 20 ? suave(0, 1.2, s.t) : 1 - suave(38.4, 39.8, s.t),
+        );
       if (saidaRef.current) saidaRef.current.textContent = s.saida.toLocaleString("pt-BR");
       const { z: zAtual, cap } = restricao();
       vazaoMostrada += (cap - vazaoMostrada) * 0.05;
@@ -476,7 +511,8 @@ export function MotionRestricoes() {
       }
       patamar = Math.min(patamar, cap); // se a velocidade cai (volta ao início), o patamar acompanha
       zrAnterior = zAtual;
-      if (vazaoRef.current) vazaoRef.current.textContent = Math.round(vazaoMostrada).toLocaleString("pt-BR");
+      if (vazaoRef.current)
+        vazaoRef.current.textContent = Math.round(vazaoMostrada).toLocaleString("pt-BR");
       LEGENDAS.forEach((l, i) => {
         const el = legendasRef.current[i];
         if (!el) return;
@@ -555,6 +591,7 @@ export function MotionRestricoes() {
           sim.s.t = nova.s.t;
           sim.s.w = nova.s.w;
           sim.s.bolas = nova.s.bolas;
+          sim.s.prox = nova.s.prox;
           sim.s.acc = nova.s.acc;
           sim.s.saida = 0;
           sim.s.saidas = [];
@@ -565,7 +602,17 @@ export function MotionRestricoes() {
           zrAnterior = restricao().z;
           desenhar();
         },
-        estado: () => ({ piscadas, capacidade: Math.round(sim.capacidade()), mostrado: Math.round(vazaoMostrada), restricao: restricao().z + 1, t: sim.s.t, bolas: sim.s.bolas.length, saida: sim.s.saida, vazao: sim.vazao(), w: sim.s.w.map((x) => Math.round(x)) }),
+        estado: () => ({
+          piscadas,
+          capacidade: Math.round(sim.capacidade()),
+          mostrado: Math.round(vazaoMostrada),
+          restricao: restricao().z + 1,
+          t: sim.s.t,
+          bolas: sim.s.bolas.length,
+          saida: sim.s.saida,
+          vazao: sim.vazao(),
+          w: sim.s.w.map((x) => Math.round(x)),
+        }),
       };
     }
 
@@ -577,7 +624,7 @@ export function MotionRestricoes() {
   }, []);
 
   return (
-    <div ref={raizRef} className="relative mx-auto h-[420px] w-full max-w-[1920px]">
+    <div id="tubo-fluxo" ref={raizRef} className="relative mx-auto h-[420px] w-full max-w-[1920px]">
       <div
         role="img"
         aria-label="Animação em loop da Teoria das Restrições: bolinhas amarelas fluem por um tubo de seis zonas. A zona mais estreita limita a saída. Ampliar as outras só acumula bolinhas antes dela; ao ampliar a restrição, o fluxo aumenta e surge a próxima restrição."
@@ -600,7 +647,10 @@ export function MotionRestricoes() {
         </div>
 
         {/* legenda que explica o fluxo: é ela que torna a animação compreensível */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-[2.5%] px-5 text-center">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-[2.5%] px-5 text-center"
+        >
           <div className="relative mx-auto h-[3.4em] max-w-4xl text-[clamp(18px,2.3vw,34px)] leading-tight">
             {LEGENDAS.map((l, i) => (
               <p
@@ -613,7 +663,10 @@ export function MotionRestricoes() {
               >
                 {l.partes.map((p, j) =>
                   p.destaque ? (
-                    <span key={j} className="font-serif text-[1.12em] font-normal normal-case italic text-accent">
+                    <span
+                      key={j}
+                      className="font-serif text-[1.12em] font-normal normal-case italic text-accent"
+                    >
                       {p.t}
                     </span>
                   ) : (
