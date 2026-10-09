@@ -7,33 +7,36 @@ const TIME = [
     iniciais: "MT",
     nome: "Marcelo Teles",
     cargo: "CEO",
-    territorio: "Growth, marketing e processos, com a Teoria das Restrições",
+    territorio: "Growth, Marketing e processos, com a Teoria das Restrições",
     resumo:
-      "Engenheiro de produção que aplica a Teoria das Restrições em estratégias de marketing e growth. Antes de acelerar qualquer canal, encontra o gargalo que realmente limita o faturamento.",
+      "Engenheiro de produção que aplica a Teoria das Restrições em estratégias de Marketing e Growth. Antes de acelerar qualquer canal, encontra o gargalo que realmente limita o faturamento.",
     competencias: [
       "Diagnóstico de gargalos comerciais e operacionais",
       "Método Rares: processos rastreáveis, replicáveis e escaláveis",
       "Tráfego, funil e máquina de vendas",
     ],
-    numeros: [
-      { v: 250, prefix: "+", suffix: "", d: 0, l: "consultorias realizadas" },
-      { v: 30, prefix: "+R$ ", suffix: " mi", d: 0, l: "gerenciados em tráfego" },
-    ],
+    numeros: [{ v: 250, prefix: "+", suffix: "", d: 0, l: "consultorias realizadas" }],
+    roi: [
+      { v: 9, d: 0 },
+      { v: 21, d: 0 },
+      { v: 37.1, d: 1 },
+    ] as Array<{ v: number; d: number }> | undefined,
   },
   {
     foto: "/marcos-schneider.jpg" as string | null,
     iniciais: "MS",
     nome: "Marcos Schneider",
     cargo: "COO",
-    territorio: "Growth, marketing, finanças e modelagem de negócio",
+    territorio: "Growth, Marketing, finanças e modelagem de negócio",
     resumo:
-      "Cuida da operação da Écsilab e do território de growth, marketing, finanças e modelagem de negócio: como o crescimento se sustenta nos números, no caixa e no desenho do negócio.",
+      "Cuida da operação da Écsilab e do território de Growth, Marketing, finanças e modelagem de negócio: como o crescimento se sustenta nos números, no caixa e no desenho do negócio.",
     competencias: [
       "Finanças e saúde do caixa no crescimento",
       "Modelagem de negócio e de receita",
       "Operação e governança do crescimento",
     ],
     numeros: [] as Array<{ v: number; prefix: string; suffix: string; d: number; l: string }>,
+    roi: undefined as Array<{ v: number; d: number }> | undefined,
   },
 ];
 
@@ -66,8 +69,12 @@ export function Mentes() {
             </div>
 
             <div className="flex flex-col">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">{s.cargo}</p>
-              <h3 className="mt-3 text-4xl font-extrabold sm:text-5xl">{s.nome}</h3>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">
+                {s.cargo}
+              </p>
+              <h3 className="nome-espelho mt-3 w-fit pb-1 text-4xl font-extrabold sm:text-5xl">
+                {s.nome}
+              </h3>
               <Fio />
               <p className="mt-3 text-lg font-medium text-accent">{s.territorio}</p>
               <p className="mt-6 text-lg leading-relaxed text-paper/75">{s.resumo}</p>
@@ -92,6 +99,22 @@ export function Mentes() {
                     </div>
                   ))}
                 </dl>
+              )}
+
+              {s.roi && (
+                <div className="mt-6">
+                  <p className="text-sm text-paper/70">
+                    Escalabilidade de negócios alcançada, com ROI de
+                  </p>
+                  <p className="mt-1 flex flex-wrap items-baseline gap-x-5 gap-y-1 text-4xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)]">
+                    {s.roi.map((r) => (
+                      <span key={r.v}>
+                        <CountUp value={r.v} suffix="x" decimals={r.d} duration={2200} />
+                      </span>
+                    ))}
+                  </p>
+                  <p className="mt-1 text-sm text-paper/70">o valor investido</p>
+                </div>
               )}
             </div>
           </article>
