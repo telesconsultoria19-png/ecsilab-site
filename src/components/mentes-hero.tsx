@@ -79,7 +79,7 @@ export function MentesHero() {
       <div
         aria-hidden="true"
         className="tech-grid pointer-events-none absolute inset-0"
-        style={{ ["--grade-opacidade" as string]: 0.16 }}
+        style={{ ["--grade-opacidade" as string]: 0.11 }}
       />
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-10 pt-20 sm:px-6 sm:pt-28">
         <Eyebrow>As mentes por trás do método</Eyebrow>
