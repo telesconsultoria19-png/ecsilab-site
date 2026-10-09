@@ -12,7 +12,7 @@ const TIME = [
       "Engenheiro de produção que aplica a Teoria das Restrições em estratégias de marketing e growth. Antes de acelerar qualquer canal, encontra o gargalo que realmente limita o faturamento.",
     competencias: [
       "Diagnóstico de gargalos comerciais e operacionais",
-      "Método RRE: processos rastreáveis, replicáveis e escaláveis",
+      "Método Rares: processos rastreáveis, replicáveis e escaláveis",
       "Tráfego, funil e máquina de vendas",
     ],
     numeros: [
