@@ -80,8 +80,8 @@ section[id] {
 /* Grade técnica bem sutil, que se dissolve nas bordas */
 .tech-grid {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, var(--grade-opacidade, 0.045)) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, var(--grade-opacidade, 0.045)) 1px, transparent 1px);
   background-size: 56px 56px;
   -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 70%);
   mask-image: radial-gradient(ellipse at 50% 40%, black 10%, transparent 70%);
