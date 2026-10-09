@@ -7,10 +7,12 @@ export function ScrollWords({
   text,
   accentFrom,
   className = "",
+  como: Tag = "h2",
 }: {
   text: string;
   accentFrom?: number;
   className?: string;
+  como?: "h1" | "h2";
 }) {
   const [ref, p] = useScrollProgress<HTMLHeadingElement>();
   const [animar, setAnimar] = useState(false);
@@ -21,7 +23,7 @@ export function ScrollWords({
   }, []);
 
   return (
-    <h2 ref={ref} className={className}>
+    <Tag ref={ref} className={className}>
       {palavras.map((w, i) => {
         const inicio = i / palavras.length;
         const op = animar ? Math.min(1, Math.max(0.14, (p * 1.25 - inicio) * palavras.length * 0.6 + 0.14)) : 1;
@@ -36,6 +38,6 @@ export function ScrollWords({
           </span>
         );
       })}
-    </h2>
+    </Tag>
   );
 }

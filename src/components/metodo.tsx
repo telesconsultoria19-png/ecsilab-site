@@ -46,11 +46,12 @@ export function Gargalos() {
   return (
     <section id="gargalos" className="relative overflow-hidden">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="pt-24 sm:pt-32">
+        <div className="pt-20 sm:pt-28">
           <Eyebrow>A dura realidade do mercado</Eyebrow>
           <ScrollWords
             text="O marketing tradicional virou moda. E moda não paga conta."
             accentFrom={5}
+            como="h1"
             className="max-w-5xl text-4xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-8xl"
           />
         </div>
