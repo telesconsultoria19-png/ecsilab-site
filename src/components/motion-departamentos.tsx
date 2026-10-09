@@ -37,13 +37,48 @@ const DEPARTAMENTOS = [
 
 // ---------- geometria ----------
 const angulo = (i: number) => (i * 2 * Math.PI) / N;
-const noPos = (i: number): [number, number] => [CX + R * Math.sin(angulo(i)), CY - R * Math.cos(angulo(i))];
+const noPos = (i: number): [number, number] => [
+  CX + R * Math.sin(angulo(i)),
+  CY - R * Math.cos(angulo(i)),
+];
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
-/** Do núcleo (s = 0) ao departamento i (s = 1). */
+// Cada fio do núcleo ao departamento passa por dois pontos intermediários que balançam devagar (como num ecossistema vivo).
+const FIO = (() => {
+  const r = semente(5);
+  return Array.from({ length: N }, () => ({
+    d1: 0.33 + r() * 0.1,
+    d2: 0.62 + r() * 0.1,
+    o1: (r() - 0.5) * 70,
+    o2: (r() - 0.5) * 70,
+    fase: r() * Math.PI * 2,
+  }));
+})();
+let deriva = 0; // relógio do balanço dos fios (atualizado a cada quadro)
+
+/** Do núcleo (s = 0) ao departamento i (s = 1), passando pelos pontos intermediários. */
 const raio = (i: number, s: number): [number, number] => {
   const [x, y] = noPos(i);
-  return [lerp(CX, x, s), lerp(CY, y, s)];
+  const f = FIO[i]!;
+  const dx = x - CX;
+  const dy = y - CY;
+  const len = Math.hypot(dx, dy) || 1;
+  const px = -dy / len;
+  const py = dx / len;
+  const a1 = f.o1 + Math.sin(deriva * 0.8 + f.fase) * 9;
+  const a2 = f.o2 + Math.cos(deriva * 0.8 + f.fase) * 9;
+  const p1: [number, number] = [CX + dx * f.d1 + px * a1, CY + dy * f.d1 + py * a1];
+  const p2: [number, number] = [CX + dx * f.d2 + px * a2, CY + dy * f.d2 + py * a2];
+  if (s <= f.d1) {
+    const k = s / f.d1;
+    return [lerp(CX, p1[0], k), lerp(CY, p1[1], k)];
+  }
+  if (s <= f.d2) {
+    const k = (s - f.d1) / (f.d2 - f.d1);
+    return [lerp(p1[0], p2[0], k), lerp(p1[1], p2[1], k)];
+  }
+  const k = (s - f.d2) / (1 - f.d2);
+  return [lerp(p2[0], x, k), lerp(p2[1], y, k)];
 };
 /** Do departamento i (s = 0) ao seguinte (s = 1), em curva puxada para o centro. */
 const anel = (i: number, s: number): [number, number] => {
@@ -92,7 +127,10 @@ const departamentoAmpliado = (ciclo: number) => (ciclo * 3 + 2) % N;
 
 type Ponto2 = [number, number];
 /** Posição e transparência da ovelha em (ciclo, instante do ciclo). Nula quando ela não está em cena. */
-function ovelhaEm(ciclo: number, tl: number): { p: Ponto2; a: number; e: number; ampliando: number } | null {
+function ovelhaEm(
+  ciclo: number,
+  tl: number,
+): { p: Ponto2; a: number; e: number; ampliando: number } | null {
   if (ciclo === 0) {
     if (tl < 0.3 || tl > 7.5) return null;
     const entra = suave(0.3, 0.6, tl);
@@ -266,14 +304,23 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
           aceso[i] = cresce((tl - t0) / 0.45);
           if (tl < t0) aceso[i] = 0;
           raioProg[i] = clamp01((tl - t0) / 0.5);
-          anelProg[i] = i === 0 ? clamp01((tl - T_CHEGADA(9) - 0.1) / 0.5) : clamp01((tl - T_CHEGADA(i)) / 0.6);
+          anelProg[i] =
+            i === 0 ? clamp01((tl - T_CHEGADA(9) - 0.1) / 0.5) : clamp01((tl - T_CHEGADA(i)) / 0.6);
         }
         nucleo = tl < T_NUCLEO ? 0 : cresce((tl - T_NUCLEO) / 0.6);
       }
       return { aceso, raioProg, anelProg, nucleo };
     };
 
-    const texto = (t: string, x: number, y: number, fonte: number, cor: string, alinhar: CanvasTextAlign, peso = 600) => {
+    const texto = (
+      t: string,
+      x: number,
+      y: number,
+      fonte: number,
+      cor: string,
+      alinhar: CanvasTextAlign,
+      peso = 600,
+    ) => {
       ctx.font = `${peso} ${fonte}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
       ctx.fillStyle = cor;
       ctx.textAlign = alinhar;
@@ -288,6 +335,7 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
       ctx.clearRect(0, 0, cw, cw);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
+      deriva = s.t;
       const rede = estadoDaRede(ciclo, tl);
       const ov = ovelhaEm(ciclo, tl);
       rotulos = [];
@@ -364,7 +412,13 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
           const a = ((k + 1) / b.rastro.length) * 0.5;
           ctx.fillStyle = `rgba(${AMARELO},${a})`;
           ctx.beginPath();
-          ctx.arc(X(p[0]), X(p[1]), Math.max(1.2, X(4.2)) * ((k + 1) / b.rastro.length), 0, Math.PI * 2);
+          ctx.arc(
+            X(p[0]),
+            X(p[1]),
+            Math.max(1.2, X(4.2)) * ((k + 1) / b.rastro.length),
+            0,
+            Math.PI * 2,
+          );
           ctx.fill();
         });
         const p = tr.f(Math.min(1, b.s));
@@ -377,6 +431,21 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
         ctx.shadowBlur = 0;
       }
 
+      // ---- pulsos contínuos: uma luz volta de cada departamento ao núcleo, sem parar ----
+      if (ciclo > 0 || tl > 7.6) {
+        for (let i = 0; i < N; i++) {
+          const u = (s.t * 0.3 + FIO[i]!.fase / (Math.PI * 2)) % 1;
+          const p = raio(i, 1 - u);
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = "rgba(255,255,255,0.8)";
+          ctx.fillStyle = "rgba(255,255,255,0.92)";
+          ctx.beginPath();
+          ctx.arc(X(p[0]), X(p[1]), Math.max(1.6, X(4.2)), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+
       // ---- núcleo (a sua empresa) ----
       {
         const k = rede.nucleo;
@@ -384,14 +453,25 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
         const r = X(36) * (0.9 + 0.1 * k);
         if (k > 0.02) {
           const g = ctx.createRadialGradient(X(CX), X(CY), 0, X(CX), X(CY), X(120));
-          g.addColorStop(0, `rgba(${AMARELO},${(0.2 + 0.1 * pulso + 0.35 * (s.brilho[N] ?? 0)) * k})`);
+          g.addColorStop(
+            0,
+            `rgba(${AMARELO},${(0.2 + 0.1 * pulso + 0.35 * (s.brilho[N] ?? 0)) * k})`,
+          );
           g.addColorStop(1, `rgba(${AMARELO},0)`);
           ctx.fillStyle = g;
           ctx.fillRect(X(CX - 120), X(CY - 120), X(240), X(240));
         }
         novelo(X(CX), X(CY), r, k);
         const fs = Math.max(10, X(23));
-        texto("SUA EMPRESA", X(CX), X(CY) + r + fs * 1.1, fs, k > 0.5 ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)", "center", 700);
+        texto(
+          "SUA EMPRESA",
+          X(CX),
+          X(CY) + r + fs * 1.1,
+          fs,
+          k > 0.5 ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)",
+          "center",
+          700,
+        );
       }
 
       // ---- departamentos e nomes ----
@@ -403,7 +483,7 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
         const r = X(17) * (0.55 + 0.45 * k) + X(5) * (s.brilho[i] ?? 0) + X(4) * amp;
         if (k > 0.02 || amp > 0) {
           const g = ctx.createRadialGradient(X(nx), X(ny), 0, X(nx), X(ny), X(52 + 30 * amp));
-          g.addColorStop(0, `rgba(${AMARELO},${(0.28 * k + 0.4 * (s.brilho[i] ?? 0) + 0.45 * amp)})`);
+          g.addColorStop(0, `rgba(${AMARELO},${0.28 * k + 0.4 * (s.brilho[i] ?? 0) + 0.45 * amp})`);
           g.addColorStop(1, `rgba(${AMARELO},0)`);
           ctx.fillStyle = g;
           ctx.fillRect(X(nx - 90), X(ny - 90), X(180), X(180));
@@ -411,7 +491,7 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
         // anéis da ampliação
         if (amp > 0.02 && ov) {
           for (let q = 0; q < 2; q++) {
-            const ph = ((s.t * 0.9 + q * 0.5) % 1);
+            const ph = (s.t * 0.9 + q * 0.5) % 1;
             ctx.beginPath();
             ctx.arc(X(nx), X(ny), X(20 + 46 * ph), 0, Math.PI * 2);
             ctx.strokeStyle = `rgba(${AMARELO},${0.7 * (1 - ph) * amp})`;
@@ -423,13 +503,22 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
 
         // nome do departamento, em até duas linhas, do lado de fora do anel
         const palavras = (DEPARTAMENTOS[i] ?? "").split(" ");
-        const linhas = palavras.length > 1 && (DEPARTAMENTOS[i] ?? "").length > 9 ? [palavras[0] ?? "", palavras.slice(1).join(" ")] : [DEPARTAMENTOS[i] ?? ""];
+        const linhas =
+          palavras.length > 1 && (DEPARTAMENTOS[i] ?? "").length > 9
+            ? [palavras[0] ?? "", palavras.slice(1).join(" ")]
+            : [DEPARTAMENTOS[i] ?? ""];
         const sx = Math.sin(angulo(i));
         const cy = -Math.cos(angulo(i));
         const lado: CanvasTextAlign = sx > 0.35 ? "left" : sx < -0.35 ? "right" : "center";
         const off = r + Math.max(8, X(14));
         const bx = X(nx) + (lado === "left" ? off : lado === "right" ? -off : 0);
-        const by = X(ny) + (Math.abs(sx) <= 0.35 ? (cy < 0 ? -off - fs * (linhas.length - 1) * 0.55 : off + fs * 0.4) : 0);
+        const by =
+          X(ny) +
+          (Math.abs(sx) <= 0.35
+            ? cy < 0
+              ? -off - fs * (linhas.length - 1) * 0.55
+              : off + fs * 0.4
+            : 0);
         const cor = k > 0.5 ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.42)";
         linhas.forEach((ln, q) => {
           const yy = by + (q - (linhas.length - 1) / 2) * fs * 1.12;
@@ -467,7 +556,8 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
           for (const p of l.partes) {
             const sp = document.createElement("span");
             sp.textContent = p.t;
-            if (p.d) sp.className = "font-serif text-[1.12em] font-normal normal-case italic text-accent";
+            if (p.d)
+              sp.className = "font-serif text-[1.12em] font-normal normal-case italic text-accent";
             el.appendChild(sp);
           }
         }
@@ -564,9 +654,16 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
         aria-label="Animação em loop: a Écsilab tece um fio de lã ligando dez departamentos (vendas, marketing, atendimento e CS, financeiro, RH, conteúdo, jurídico, imobiliário, saúde e estética e e-commerce) a um núcleo que é a sua empresa. Depois a Écsilab sai de cena e a rede segue funcionando sozinha, em nome da sua empresa."
         className={`relative aspect-square w-full transition-opacity duration-1000 ${ativo ? "opacity-100" : "opacity-0"}`}
       >
-        <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full" />
+        <canvas
+          ref={canvasRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full"
+        />
 
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-[2%] px-3 text-center">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-[2%] px-3 text-center"
+        >
           <div className="relative mx-auto h-[2.6em] max-w-md text-[clamp(16px,2.2vw,26px)] leading-tight">
             {[0, 1, 2].map((q) => (
               <p
