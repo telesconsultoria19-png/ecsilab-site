@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 type Dados = { w: number; h: number; p: number[] };
 
 /** Duração da construção da ovelha: o relógio é elevado a uma potência, então começa bem devagar e acelera. */
-const TEMPO_CONSTRUCAO = 10;
+const TEMPO_CONSTRUCAO = 4.6;
 const AMARELO = "253,202,10";
 const BRANCO = "255,255,255";
 
@@ -46,22 +46,35 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
       lim: Float32Array;
     let tipo: Uint8Array;
 
+    // o canvas cobre a seção inteira (a poeira vem de todo lado); a ovelha se forma onde está a caixa
+    const secao = caixa.closest("section") ?? caixa;
+    let ox = 0;
+    let oy = 0;
+    let sBase = 1;
     const medir = () => {
       const r = caixa.getBoundingClientRect();
+      const sr = secao.getBoundingClientRect();
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      cw = r.width;
-      ch = r.height;
+      cw = sr.width;
+      ch = sr.height;
+      canvas.style.left = `${sr.left - r.left}px`;
+      canvas.style.top = `${sr.top - r.top}px`;
+      canvas.style.width = `${cw}px`;
+      canvas.style.height = `${ch}px`;
       canvas.width = Math.round(cw * dpr);
       canvas.height = Math.round(ch * dpr);
+      ox = r.left + r.width / 2 - sr.left;
+      oy = r.top + r.height / 2 - sr.top;
+      sBase = Math.min(r.width, r.height) * 1.08;
     };
 
     const desenhar = () => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, cw, ch);
       if (n === 0) return;
-      const S = Math.min(cw, ch) * 1.08;
-      const cx = cw / 2;
-      const cy = ch / 2;
+      const S = sBase;
+      const cx = ox;
+      const cy = oy;
       const respira = 1 + Math.sin(tempo * 0.9) * 0.012;
       const G = reduzir ? 1 : Math.min(1, Math.pow(tempo / TEMPO_CONSTRUCAO, 1.6));
 
@@ -193,13 +206,13 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
           rnd[i] = Math.random();
           x[i] = Math.random() * cw;
           y[i] = Math.random() * ch;
-          dur[i] = 1.4 + Math.random() * 1.0;
+          dur[i] = 1.2 + Math.random() * 1.0;
           ini[i] = reduzir ? 0 : -1;
           // ordem de construção: do centro (rosto) para fora (lã), com um pouco de acaso
           lim[i] = Math.min(1, Math.hypot(nx[i]!, ny[i]!) / 0.5) * 0.82 + Math.random() * 0.18;
           if (reduzir) {
-            x[i] = cw / 2 + nx[i]! * Math.min(cw, ch) * 1.08;
-            y[i] = ch / 2 + ny[i]! * Math.min(cw, ch) * 1.08;
+            x[i] = ox + nx[i]! * sBase;
+            y[i] = oy + ny[i]! * sBase;
           }
         }
         desenhar();
@@ -225,6 +238,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
       desenhar();
     });
     ro.observe(caixa);
+    ro.observe(secao);
     const io = new IntersectionObserver(([e]) => {
       visivel = !!e?.isIntersecting;
       if (visivel) tocar();
@@ -249,7 +263,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
       aria-label="A ovelha da Écsilab, formada por partículas de luz"
       className={`relative aspect-square w-full ${className}`}
     >
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 h-full w-full" />
+      <canvas ref={canvasRef} aria-hidden="true" className="pointer-events-none absolute -z-10" />
     </div>
   );
 }
