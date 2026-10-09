@@ -124,7 +124,7 @@ function Hero() {
   const bloco = "block w-fit max-w-full will-change-transform";
 
   return (
-    <section ref={secaoRef} className="ardosia relative overflow-hidden">
+    <section ref={secaoRef} className="relative overflow-hidden bg-black">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-ink"
