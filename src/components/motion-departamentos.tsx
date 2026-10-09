@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 
 // Palco de projeto: 1000 x 980, escalado para o tamanho real.
 const W = 1000;
-const H = 980;
+const H = 920;
 const CX = 500;
 const CY = 440;
 const N = 10; // departamentos; o índice N é a empresa (núcleo)
@@ -90,7 +90,16 @@ const POS: Array<[number, number]> = RAIOS.map((r, i) => [
   CX + r * Math.cos(angulo(i)) * 0.8,
   CY + r * Math.sin(angulo(i)),
 ]);
-const pos = (i: number): [number, number] => (i === N ? [CX, CY] : POS[i]!);
+// Os corpos flutuam devagar, como células em suspensão, para a rede não parecer rígida.
+let deriva = 0;
+const pos = (i: number): [number, number] => {
+  if (i === N) return [CX + Math.sin(deriva * 0.21) * 3, CY + Math.cos(deriva * 0.17) * 3];
+  const [x, y] = POS[i]!;
+  return [
+    x + Math.sin(deriva * 0.33 + i * 1.7) * 7 + Math.sin(deriva * 0.12 + i * 0.6) * 4,
+    y + Math.cos(deriva * 0.29 + i * 2.3) * 7 + Math.cos(deriva * 0.11 + i * 1.1) * 4,
+  ];
+};
 const raioDe = (i: number) => (i === N ? RHUB : RS);
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
@@ -180,47 +189,75 @@ type Dendrito = { ang: number; comp: number; curva: number; bif: number; bifComp
 const DENDRITOS: Dendrito[][] = (() => {
   const r = semente(77);
   return Array.from({ length: N + 1 }, (_, i) => {
-    const total = i === N ? 14 : 7;
+    const total = i === N ? 5 : 3;
     return Array.from({ length: total }, (_, q) => ({
       ang: (q / total) * Math.PI * 2 + (r() - 0.5) * 0.5,
-      comp: (i === N ? 38 : 24) + r() * (i === N ? 40 : 26),
+      comp: (i === N ? 30 : 18) + r() * (i === N ? 28 : 18),
       curva: (r() - 0.5) * 0.9,
       bif: 0.45 + r() * 0.5,
-      bifComp: (i === N ? 18 : 12) + r() * 12,
+      bifComp: (i === N ? 14 : 9) + r() * 9,
     }));
   });
 })();
 
-let deriva = 0;
-
-/** Ponto da aresta k, em s (0 = junto ao corpo de `a`, 1 = junto ao corpo de `b`): axônio em curva cúbica que balança de leve. */
-const geometriaAresta = (k: number) => {
-  const e = ARESTAS[k]!;
-  const [x0, y0] = pos(e.a);
-  const [x1, y1] = pos(e.b);
-  const L = Math.hypot(x1 - x0, y1 - y0) || 1;
-  const dx = (x1 - x0) / L;
-  const dy = (y1 - y0) / L;
-  const ra = raioDe(e.a) + GAP;
-  const rb = raioDe(e.b) + GAP;
-  const p0: [number, number] = [x0 + dx * ra, y0 + dy * ra];
-  const p3: [number, number] = [x1 - dx * rb, y1 - dy * rb];
-  const d = Math.hypot(p3[0] - p0[0], p3[1] - p0[1]);
-  const px = -dy;
-  const py = dx;
-  const o1 = e.o + Math.sin(deriva * 0.5 + e.fase) * 10;
-  const o2 = -e.o * 0.8 + Math.cos(deriva * 0.5 + e.fase) * 10;
-  const p1: [number, number] = [p0[0] + dx * d * 0.33 + px * o1, p0[1] + dy * d * 0.33 + py * o1];
-  const p2: [number, number] = [p3[0] - dx * d * 0.33 + px * o2, p3[1] - dy * d * 0.33 + py * o2];
-  return { p0, p1, p2, p3 };
+type Geo = {
+  p0: [number, number];
+  p1: [number, number];
+  p2: [number, number];
+  p3: [number, number];
 };
-const pontoDaAresta = (k: number, s: number): [number, number] => {
-  const { p0, p1, p2, p3 } = geometriaAresta(k);
+const GEO: Geo[] = ARESTAS.map(() => ({ p0: [0, 0], p1: [0, 0], p2: [0, 0], p3: [0, 0] }));
+let geoTempo = -1;
+/** Recalcula a forma de todos os axônios (uma vez por quadro): curvas cúbicas que balançam de leve. */
+const atualizarGeo = () => {
+  if (geoTempo === deriva) return;
+  geoTempo = deriva;
+  ARESTAS.forEach((e, k) => {
+    const [x0, y0] = pos(e.a);
+    const [x1, y1] = pos(e.b);
+    const L = Math.hypot(x1 - x0, y1 - y0) || 1;
+    const dx = (x1 - x0) / L;
+    const dy = (y1 - y0) / L;
+    const ra = raioDe(e.a) + GAP;
+    const rb = raioDe(e.b) + GAP;
+    const p0: [number, number] = [x0 + dx * ra, y0 + dy * ra];
+    const p3: [number, number] = [x1 - dx * rb, y1 - dy * rb];
+    const d = Math.hypot(p3[0] - p0[0], p3[1] - p0[1]);
+    const px = -dy;
+    const py = dx;
+    const o1 =
+      e.o + Math.sin(deriva * 0.45 + e.fase) * 16 + Math.sin(deriva * 0.8 + e.fase * 2) * 5;
+    const o2 =
+      -e.o * 0.8 + Math.cos(deriva * 0.4 + e.fase) * 16 + Math.cos(deriva * 0.7 + e.fase * 3) * 5;
+    const g = GEO[k]!;
+    g.p0 = p0;
+    g.p3 = p3;
+    g.p1 = [p0[0] + dx * d * 0.33 + px * o1, p0[1] + dy * d * 0.33 + py * o1];
+    g.p2 = [p3[0] - dx * d * 0.33 + px * o2, p3[1] - dy * d * 0.33 + py * o2];
+  });
+};
+const cubica = (g: Geo, s: number): [number, number] => {
   const u = 1 - s;
   return [
-    u * u * u * p0[0] + 3 * u * u * s * p1[0] + 3 * u * s * s * p2[0] + s * s * s * p3[0],
-    u * u * u * p0[1] + 3 * u * u * s * p1[1] + 3 * u * s * s * p2[1] + s * s * s * p3[1],
+    u * u * u * g.p0[0] + 3 * u * u * s * g.p1[0] + 3 * u * s * s * g.p2[0] + s * s * s * g.p3[0],
+    u * u * u * g.p0[1] + 3 * u * u * s * g.p1[1] + 3 * u * s * s * g.p2[1] + s * s * s * g.p3[1],
   ];
+};
+/** Ponto da aresta k, em s (0 = junto ao corpo de `a`, 1 = junto ao corpo de `b`), com uma ondulação fina e viva. */
+const pontoDaAresta = (k: number, s: number): [number, number] => {
+  atualizarGeo();
+  const g = GEO[k]!;
+  const [x, y] = cubica(g, s);
+  const [qx, qy] = cubica(g, Math.min(1, s + 0.01));
+  const [rx, ry] = cubica(g, Math.max(0, s - 0.01));
+  const tx = qx - rx;
+  const ty = qy - ry;
+  const tl = Math.hypot(tx, ty) || 1;
+  const f = ARESTAS[k]!.fase;
+  const onda =
+    (Math.sin(s * 11 + deriva * 1.1 + f) * 3.4 + Math.sin(s * 23 - deriva * 0.8 + f * 2) * 1.5) *
+    Math.sin(Math.PI * s);
+  return [x - (ty / tl) * onda, y + (tx / tl) * onda];
 };
 
 // ---------- roteiro ----------
@@ -294,7 +331,7 @@ const legendasDoCiclo = (ciclo: number): Legenda[] =>
       ];
 
 // ---------- simulação (sinais que disparam de um neurônio a outro) ----------
-type Sinal = { e: number; u: number; sentido: 1 | -1 };
+type Sinal = { e: number; u: number; sentido: 1 | -1; dur: number };
 type Rajada = { e: number; sentido: 1 | -1; t: number };
 
 function criarSim() {
@@ -312,7 +349,7 @@ function criarSim() {
 
   const lancar = (e: number, de: number) => {
     const ar = ARESTAS[e]!;
-    s.sinais.push({ e, u: 0, sentido: ar.a === de ? 1 : -1 });
+    s.sinais.push({ e, u: 0, sentido: ar.a === de ? 1 : -1, dur: 0.7 + rnd() * 0.6 });
   };
 
   const passo = (dt: number) => {
@@ -330,7 +367,7 @@ function criarSim() {
         }
       }
     }
-    for (const sg of s.sinais) sg.u += dt / 0.8;
+    for (const sg of s.sinais) sg.u += dt / sg.dur;
     const novos: Sinal[] = [];
     for (const sg of s.sinais) {
       if (sg.u < 1) continue;
@@ -344,7 +381,7 @@ function criarSim() {
         const e2 = inc[Math.floor(rnd() * inc.length)];
         if (e2 !== undefined) {
           const a2 = ARESTAS[e2]!;
-          novos.push({ e: e2, u: 0, sentido: a2.a === chegou ? 1 : -1 });
+          novos.push({ e: e2, u: 0, sentido: a2.a === chegou ? 1 : -1, dur: 0.7 + rnd() * 0.6 });
         }
       }
     }
@@ -409,6 +446,41 @@ export function MotionDepartamentos({
     };
     const X = (v: number) => v * sc;
 
+    /** Contorno de célula: um círculo levemente irregular, que respira. */
+    const celula = (cx: number, cy: number, r: number, fase: number) => {
+      ctx.beginPath();
+      const passos = 28;
+      for (let q = 0; q <= passos; q++) {
+        const t = (q / passos) * Math.PI * 2;
+        const rr =
+          r *
+          (1 +
+            0.05 * Math.sin(3 * t + deriva * 1.2 + fase) +
+            0.035 * Math.sin(5 * t - deriva * 0.9 + fase * 2));
+        const x = cx + Math.cos(t) * rr;
+        const y = cy + Math.sin(t) * rr;
+        if (q === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+    };
+
+    // selo da ovelha em preto, para o fundo branco: o ícone vira uma silhueta escura
+    let selo: HTMLCanvasElement | null = null;
+    const prepararSelo = () => {
+      if (!claro || !ovelha.complete || !ovelha.naturalWidth) return;
+      const c = document.createElement("canvas");
+      c.width = ovelha.naturalWidth;
+      c.height = ovelha.naturalHeight;
+      const g = c.getContext("2d");
+      if (!g) return;
+      g.drawImage(ovelha, 0, 0);
+      g.globalCompositeOperation = "source-in";
+      g.fillStyle = "#0a0a0a";
+      g.fillRect(0, 0, c.width, c.height);
+      selo = c;
+    };
+
     /** Estado dos neurônios e do núcleo no instante atual. */
     const estadoDaRede = (ciclo: number, tl: number) => {
       const aceso = new Array<number>(N).fill(1);
@@ -429,7 +501,8 @@ export function MotionDepartamentos({
       ctx.lineWidth = Math.max(0.8, X(1.5));
       ctx.strokeStyle = `rgba(${forte > 0.05 ? OURO : P.traco},${(forte > 0.05 ? 0.55 : claro ? 0.5 : 0.38) * k})`;
       for (const d of DENDRITOS[i]!) {
-        const bal = Math.sin(deriva * 0.7 + d.ang * 3) * 0.08;
+        const bal =
+          Math.sin(deriva * 0.6 + d.ang * 3) * 0.2 + Math.sin(deriva * 1.3 + d.ang) * 0.06;
         const a = d.ang + bal;
         const ux = Math.cos(a);
         const uy = Math.sin(a);
@@ -559,7 +632,8 @@ export function MotionDepartamentos({
       // ---- sinais (potenciais de ação) e rajadas de neurotransmissores nas sinapses ----
       if (emOperacao) {
         for (const sg of s.sinais) {
-          const f = sg.sentido === 1 ? sg.u : 1 - sg.u;
+          const ue = sg.u * sg.u * (3 - 2 * sg.u) * 0.55 + sg.u * 0.45; // acelera e freia, como um impulso
+          const f = sg.sentido === 1 ? ue : 1 - ue;
           // rastro
           for (let q = 6; q >= 1; q--) {
             const ff = clamp01(f - sg.sentido * q * 0.035);
@@ -635,8 +709,7 @@ export function MotionDepartamentos({
         g.addColorStop(1, `rgba(${P.glow},0)`);
         ctx.fillStyle = g;
         ctx.fillRect(X(CX - 150), X(CY - 150), X(300), X(300));
-        ctx.beginPath();
-        ctx.arc(X(CX), X(CY), X(RHUB), 0, Math.PI * 2);
+        celula(X(pos(N)[0]), X(pos(N)[1]), X(RHUB), 4.2);
         ctx.fillStyle = P.fundo;
         ctx.fill();
         ctx.lineWidth = Math.max(1.4, X(3.5));
@@ -662,7 +735,7 @@ export function MotionDepartamentos({
       // ---- departamentos (corpos dos neurônios) e nomes ----
       const fsNome = Math.max(10.5, Math.min(15, cw * 0.026));
       for (let i = 0; i < N; i++) {
-        const [nx, ny] = POS[i]!;
+        const [nx, ny] = pos(i);
         const k = rede.aceso[i] ?? 0;
         const amp = i === ampliado && ov ? ov.ampliando : 0;
         const forte = Math.max(s.brilho[i] ?? 0, amp);
@@ -684,8 +757,7 @@ export function MotionDepartamentos({
             ctx.stroke();
           }
         }
-        ctx.beginPath();
-        ctx.arc(X(nx), X(ny), r, 0, Math.PI * 2);
+        celula(X(nx), X(ny), r, i * 1.3);
         ctx.fillStyle = k > 0.5 ? `rgb(${claro ? "253,202,10" : OURO})` : P.fundo;
         ctx.fill();
         ctx.lineWidth = Math.max(1.2, X(2.4));
@@ -729,8 +801,14 @@ export function MotionDepartamentos({
         const boba = Math.sin(s.t * 3.2) * X(3);
         ctx.globalAlpha = ov.a;
         ctx.shadowBlur = 26;
-        ctx.shadowColor = `rgba(${P.glow},0.9)`;
-        ctx.drawImage(ovelha, X(ox) - tam / 2, X(oy) - tam / 2 + boba, tam, tam);
+        ctx.shadowColor = claro ? "rgba(0,0,0,0.35)" : `rgba(${P.glow},0.9)`;
+        ctx.drawImage(
+          claro && selo ? selo : ovelha,
+          X(ox) - tam / 2,
+          X(oy) - tam / 2 + boba,
+          tam,
+          tam,
+        );
         ctx.shadowBlur = 0;
         ctx.globalAlpha = 1;
       }
@@ -789,7 +867,11 @@ export function MotionDepartamentos({
       for (let k = 0; k < 60 * 6; k++) sim.passo(1 / 60);
       sim.s.t = CICLO + 14;
     }
-    ovelha.onload = desenhar;
+    ovelha.onload = () => {
+      prepararSelo();
+      desenhar();
+    };
+    prepararSelo();
     desenhar();
 
     const ro = new ResizeObserver(() => {
@@ -852,25 +934,22 @@ export function MotionDepartamentos({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 h-full w-full"
         />
+      </div>
 
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-[0.5%] px-3 text-center"
-        >
-          <div className="relative mx-auto h-[2.6em] max-w-md text-[clamp(16px,2.2vw,26px)] leading-tight">
-            {[0, 1, 2].map((q) => (
-              <p
-                key={q}
-                ref={(el) => {
-                  legendasRef.current[q] = el;
-                }}
-                style={{ opacity: 0 }}
-                className={`absolute inset-x-0 font-extrabold uppercase tracking-tight ${
-                  claro ? "text-black" : "text-white [text-shadow:0_2px_20px_rgba(0,0,0,0.95)]"
-                }`}
-              />
-            ))}
-          </div>
+      <div aria-hidden="true" className="pointer-events-none mt-5 px-3 text-center sm:mt-2">
+        <div className="relative mx-auto h-[2.6em] max-w-md text-[clamp(16px,2.2vw,26px)] leading-tight">
+          {[0, 1, 2].map((q) => (
+            <p
+              key={q}
+              ref={(el) => {
+                legendasRef.current[q] = el;
+              }}
+              style={{ opacity: 0 }}
+              className={`absolute inset-x-0 font-extrabold uppercase tracking-tight ${
+                claro ? "text-black" : "text-white [text-shadow:0_2px_20px_rgba(0,0,0,0.95)]"
+              }`}
+            />
+          ))}
         </div>
       </div>
 
