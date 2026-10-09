@@ -185,8 +185,44 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
     medir();
     fetch("/ovelha-particulas.json")
       .then((res) => res.json() as Promise<Dados>)
-      .then((d) => {
+      .then((dados) => {
+        let d = dados;
         if (!vivo) return;
+        // "BLACK SHEEP" no pescoço da ovelha, como espaço vazio: as partículas que cairiam sobre as letras não existem
+        const mascara = document.createElement("canvas");
+        mascara.width = d.w;
+        mascara.height = d.h;
+        const mc = mascara.getContext("2d", { willReadFrequently: true });
+        let letras: Uint8ClampedArray | null = null;
+        if (mc) {
+          mc.fillStyle = "#000";
+          mc.strokeStyle = "#000";
+          mc.lineWidth = 2.2;
+          mc.textAlign = "center";
+          mc.textBaseline = "middle";
+          mc.font = `800 ${d.h * 0.056}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
+          try {
+            (mc as unknown as { letterSpacing: string }).letterSpacing = `${d.h * 0.012}px`;
+          } catch {
+            /* sem suporte a espaçamento entre letras */
+          }
+          for (const [txt, fy] of [
+            ["BLACK", 0.762],
+            ["SHEEP", 0.822],
+          ] as const) {
+            mc.fillText(txt, d.w * 0.5, d.h * fy);
+            mc.strokeText(txt, d.w * 0.5, d.h * fy);
+          }
+          letras = mc.getImageData(0, 0, d.w, d.h).data;
+        }
+        const pts: number[] = [];
+        for (let k = 0; k < d.p.length; k += 3) {
+          const px = Math.min(d.w - 1, Math.max(0, Math.round(d.p[k]!)));
+          const py = Math.min(d.h - 1, Math.max(0, Math.round(d.p[k + 1]!)));
+          if (letras && letras[(py * d.w + px) * 4 + 3]! > 40) continue;
+          pts.push(d.p[k]!, d.p[k + 1]!, d.p[k + 2]!);
+        }
+        d = { ...d, p: pts };
         n = d.p.length / 3;
         nx = new Float32Array(n);
         ny = new Float32Array(n);
