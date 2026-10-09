@@ -3,13 +3,19 @@ import { CountUp, Section } from "@/components/ui-bits";
 
 const TIME = [
   {
-    foto: "/marcelo-teles.jpg" as string | null,
+    foto: "/marcelo-teles-ceo.jpg" as string | null,
+    /** a foto já traz nome, cargo e áreas de conhecimento escritos: o texto lateral não repete isso */
+    fotoComTexto: true,
     iniciais: "MT",
     nome: "Marcelo Teles",
     cargo: "CEO",
     territorio: "Growth, Marketing e processos, com a Teoria das Restrições",
-    resumo:
-      "Engenheiro de produção que aplica a Teoria das Restrições em estratégias de Marketing e Growth. Antes de acelerar qualquer canal, encontra o gargalo que realmente limita o faturamento.",
+    historia: [
+      "Marcelo é engenheiro de produção e levou para o Marketing uma pergunta que a fábrica ensina cedo: onde está o gargalo? Em vez de apostar em mais um canal, mais uma campanha, mais verba, ele aprendeu a procurar o ponto que realmente limita o faturamento.",
+      "Em mais de 250 consultorias, o cenário se repetiu: empresas injetando dinheiro em tráfego sem saber o que travava o próprio crescimento. Ele passou a fazer o contrário. Primeiro diagnostica o fluxo, depois quebra a restrição, e só então acelera.",
+      "Dessa forma de trabalhar nasceu o Rares, o método que deixa cada decisão com lastro para ser repetida e escalada. E os números mostram o que acontece quando o esforço vai para o lugar certo:",
+    ],
+    resumo: "",
     competencias: [
       "Diagnóstico de gargalos comerciais e operacionais",
       "Método Rares: processos rastreáveis, replicáveis e escaláveis",
@@ -24,6 +30,8 @@ const TIME = [
   },
   {
     foto: "/marcos-schneider.jpg" as string | null,
+    fotoComTexto: false,
+    historia: [] as string[],
     iniciais: "MS",
     nome: "Marcos Schneider",
     cargo: "COO",
@@ -55,7 +63,11 @@ export function Mentes() {
                   src={s.foto}
                   alt={`${s.nome}, ${s.cargo}`}
                   loading="lazy"
-                  className="aspect-[4/5] w-full rounded-3xl object-cover object-[50%_20%] shadow-[0_0_80px_-30px_rgba(253,202,10,0.45)]"
+                  className={`w-full rounded-3xl object-cover shadow-[0_0_80px_-30px_rgba(253,202,10,0.45)] ${
+                    s.fotoComTexto
+                      ? "aspect-[2/3] object-[50%_50%]"
+                      : "aspect-[4/5] object-[50%_20%]"
+                  }`}
                 />
               ) : (
                 <div
@@ -69,27 +81,43 @@ export function Mentes() {
             </div>
 
             <div className="flex flex-col">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">
-                {s.cargo}
-              </p>
-              <h3 className="nome-espelho mt-3 w-fit pb-1 text-4xl font-extrabold sm:text-5xl">
-                {s.nome}
-              </h3>
-              <Fio />
-              <p className="mt-3 text-lg font-medium text-accent">{s.territorio}</p>
-              <p className="mt-6 text-lg leading-relaxed text-paper/75">{s.resumo}</p>
+              {s.fotoComTexto ? (
+                <>
+                  {/* nome, cargo e áreas já estão na foto; o título fica só para leitores de tela */}
+                  <h3 className="sr-only">
+                    {s.nome}, {s.cargo}. {s.territorio}
+                  </h3>
+                  <div className="space-y-5 text-lg leading-relaxed text-paper/80 sm:text-xl">
+                    {s.historia.map((p) => (
+                      <p key={p}>{p}</p>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">
+                    {s.cargo}
+                  </p>
+                  <h3 className="nome-espelho mt-3 w-fit pb-1 text-4xl font-extrabold sm:text-5xl">
+                    {s.nome}
+                  </h3>
+                  <Fio />
+                  <p className="mt-3 text-lg font-medium text-accent">{s.territorio}</p>
+                  <p className="mt-6 text-lg leading-relaxed text-paper/75">{s.resumo}</p>
 
-              <ul className="mb-8 mt-6 space-y-2 text-paper/90">
-                {s.competencias.map((c) => (
-                  <li key={c} className="flex gap-3">
-                    <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                    {c}
-                  </li>
-                ))}
-              </ul>
+                  <ul className="mb-8 mt-6 space-y-2 text-paper/90">
+                    {s.competencias.map((c) => (
+                      <li key={c} className="flex gap-3">
+                        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                        {c}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
               {s.numeros.length > 0 && (
-                <dl className="grid grid-cols-2 gap-4 pt-2">
+                <dl className="mt-8 grid grid-cols-2 gap-4 pt-2">
                   {s.numeros.map((n) => (
                     <div key={n.l}>
                       <dt className="text-4xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)]">
