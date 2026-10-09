@@ -13,7 +13,7 @@ import {
 
 type Versao = "base" | "estendido";
 
-/** Método Rares: assinatura de Marcelo Teles, desenvolvida pela Écsilab. */
+/** Método Rares: desenvolvido pelas duas mentes da Écsilab. */
 export function MetodoRares() {
   const [versao, setVersao] = useState<Versao>("base");
 
@@ -34,9 +34,9 @@ export function MetodoRares() {
           }
           lead={
             <>
-              Rares ({RARES_PRONUNCIA}) é uma assinatura de Marcelo Teles, desenvolvida pela
-              Écsilab. Todo resultado precisa deixar lastro suficiente para ser repetido, e a
-              empresa precisa crescer sem travar quando ele se repete.
+              Rares ({RARES_PRONUNCIA}) foi desenvolvido pelas duas mentes da Écsilab. Todo
+              resultado precisa deixar lastro suficiente para ser repetido, e a empresa precisa
+              crescer sem travar quando ele se repete.
             </>
           }
         />

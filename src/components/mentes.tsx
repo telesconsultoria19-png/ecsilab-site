@@ -13,7 +13,7 @@ const TIME = [
     historia: [
       "Marcelo é engenheiro de produção e levou para o Marketing uma pergunta que a fábrica ensina cedo: onde está o gargalo? Em vez de apostar em mais um canal, mais uma campanha, mais verba, ele aprendeu a procurar o ponto que realmente limita o faturamento.",
       "Em mais de 250 consultorias, o cenário se repetiu: empresas injetando dinheiro em tráfego sem saber o que travava o próprio crescimento. Ele passou a fazer o contrário. Primeiro diagnostica o fluxo, depois quebra a restrição, e só então acelera.",
-      "Dessa forma de trabalhar nasceu o Rares, o método que deixa cada decisão com lastro para ser repetida e escalada. E os números mostram o que acontece quando o esforço vai para o lugar certo:",
+      "Dessa forma de trabalhar nasceu o Rares, método que ele desenvolveu ao lado de Marcos Schneider e que deixa cada decisão com lastro para ser repetida e escalada. E os números mostram o que acontece quando o esforço vai para o lugar certo:",
     ],
     resumo: "",
     competencias: [

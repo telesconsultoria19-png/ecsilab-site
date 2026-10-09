@@ -1,4 +1,4 @@
-// Conteúdo do método Rares: assinatura de Marcelo Teles, desenvolvida pela Écsilab.
+// Conteúdo do método Rares: desenvolvido pelas duas mentes da Écsilab (Marcelo Teles e Marcos Schneider).
 // Versão base: Rastreável, Replicável, Escalável (RA-RE-ES).
 // Versão avançada (para quem já passou pela base): R-A-R-E-S, com Auditável e Sustentável.
 
