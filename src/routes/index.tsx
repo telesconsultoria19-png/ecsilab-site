@@ -5,7 +5,7 @@ import { Calculadora } from "@/components/calculadora";
 import { CaseG360 } from "@/components/case-g360";
 import { Contato } from "@/components/contato";
 import { Diagnostico } from "@/components/diagnostico";
-import { GargalosHero } from "@/components/gargalos-hero";
+import { GargalosEstatico } from "@/components/gargalos-estatico";
 import { Metodo } from "@/components/metodo";
 import { MotionRestricoes } from "@/components/motion-restricoes";
 import { SiteFooter } from "@/components/site-footer";
@@ -24,7 +24,7 @@ function Home() {
     <>
       <SiteHeader />
       <main>
-        <GargalosHero />
+        <GargalosEstatico />
         <section id="restricoes" className="relative overflow-hidden pt-20 sm:pt-28">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <SectionHead
