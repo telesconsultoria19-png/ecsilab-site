@@ -1,8 +1,10 @@
 // Conteúdo do método Rares: assinatura de Marcelo Teles, desenvolvida pela Écsilab.
 // Versão base: Rastreável, Replicável, Escalável (RA-RE-ES).
-// Versão estendida (para quem já passou pela base): R-A-R-E-S, com Auditável e Sustentável.
+// Versão avançada (para quem já passou pela base): R-A-R-E-S, com Auditável e Sustentável.
 
 export const RARES_PRONUNCIA = "rá-res";
+/** Nome comercial da versão avançada: troque aqui para mudar em todo o site. */
+export const NOME_AVANCADO = "Rares Apex";
 
 export const RARES_BASE = [
   {

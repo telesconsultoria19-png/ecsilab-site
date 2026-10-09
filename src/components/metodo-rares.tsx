@@ -4,6 +4,7 @@ import { useState } from "react";
 import { GlowCard, SectionHead } from "@/components/ui-bits";
 import {
   FERRAMENTAS_LASTRO,
+  NOME_AVANCADO,
   PERGUNTAS_LASTRO,
   RARES_BASE,
   RARES_ESTENDIDO,
@@ -48,7 +49,7 @@ export function MetodoRares() {
           {(
             [
               ["base", "Rares"],
-              ["estendido", "Rares Estendido"],
+              ["estendido", NOME_AVANCADO],
             ] as const
           ).map(([id, rotulo]) => {
             const ativa = versao === id;
@@ -86,13 +87,13 @@ export function MetodoRares() {
               ))}
             </div>
             <p className="mt-8 text-paper/70">
-              Para quem já passou por aqui e quer mais robustez, existe o{" "}
+              Para empresas que já passaram pelo Rares e querem o próximo nível, existe o{" "}
               <button
                 type="button"
                 onClick={() => setVersao("estendido")}
                 className="font-semibold text-accent hover:underline"
               >
-                Rares Estendido
+                {NOME_AVANCADO}
               </button>
               .
             </p>
@@ -100,8 +101,9 @@ export function MetodoRares() {
         ) : (
           <div role="tabpanel" className="animate-[tab-in_0.45s_ease]">
             <p className="max-w-3xl text-lg leading-relaxed text-paper/80">
-              Para empresas que já passaram pelo Rares e estão mais maduras. Cada letra de R-A-R-E-S
-              vira um pilar: entram o <strong className="text-paper">Auditável</strong> e o{" "}
+              O nível avançado para empresas que já passaram pelo Rares e chegaram à maturidade.
+              Cada letra de R-A-R-E-S vira um pilar: entram o{" "}
+              <strong className="text-paper">Auditável</strong> e o{" "}
               <strong className="text-paper">Sustentável</strong>, com etapas próprias para modelar
               e organizar cada um deles.
             </p>
@@ -124,7 +126,7 @@ export function MetodoRares() {
                       <h3 className="text-2xl font-bold">{p.nome}</h3>
                       {p.novo && (
                         <span className="rounded-full bg-accent px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-ink">
-                          Novo na versão estendida
+                          Exclusivo do {NOME_AVANCADO.replace("Rares ", "")}
                         </span>
                       )}
                     </div>
