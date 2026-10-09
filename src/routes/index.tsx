@@ -10,9 +10,7 @@ import { Gargalos, Metodo } from "@/components/metodo";
 import { MotionRestricoes } from "@/components/motion-restricoes";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { SolucoesIA } from "@/components/solucoes-ia";
 import { SectionHead } from "@/components/ui-bits";
-import { Time } from "@/components/time";
 import { SECOES_VISIVEIS } from "@/lib/secoes";
 import { DESCRICAO_PADRAO, TITULO_PADRAO, seo } from "@/lib/seo";
 
@@ -43,13 +41,11 @@ function Home() {
           </div>
           <MotionRestricoes />
         </section>
-        <Time />
         <Diagnostico />
         <Metodo />
-        <Calculadora />
         <CaseG360 />
+        <Calculadora />
         {SECOES_VISIVEIS.clientes && <Clientes />}
-        <SolucoesIA />
         <Contato />
       </main>
       <SiteFooter />

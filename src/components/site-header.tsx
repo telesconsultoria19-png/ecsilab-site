@@ -4,12 +4,12 @@ import { Menu, X } from "lucide-react";
 
 const idDe = (href: string) => href.split("#")[1] ?? "";
 
-export const NAV: Array<{ href: string; label: string; pagina?: boolean }> = [
-  { href: "/#time", label: "Time" },
+export const NAV: Array<{ href: string; label: string; pagina?: boolean; destaque?: boolean }> = [
+  { href: "/arquitetos", label: "Arquitetos", pagina: true },
   { href: "/#diagnostico", label: "Diagnóstico" },
   { href: "/#metodo", label: "Método" },
-  { href: "/#portfolio", label: "Portfólio" },
-  { href: "/enterprise", label: "Enterprise", pagina: true },
+  { href: "/solucoes", label: "Soluções", pagina: true },
+  { href: "/enterprise", label: "Enterprise", pagina: true, destaque: true },
   { href: "/#contato", label: "Contato" },
 ];
 
@@ -71,7 +71,7 @@ export function SiteHeader() {
                 href={item.href}
                 aria-current={atual ? (item.pagina ? "page" : "location") : undefined}
                 className={
-                  item.pagina
+                  item.destaque
                     ? `rounded-full px-3.5 py-1.5 text-sm font-semibold transition hover:bg-accent hover:text-ink ${
                         atual ? "bg-accent text-ink" : "bg-accent/[0.14] text-accent"
                       }`
@@ -119,7 +119,7 @@ export function SiteHeader() {
                   onClick={() => setOpen(false)}
                   aria-current={item.pagina && caminho === item.href ? "page" : undefined}
                   className={`block rounded-md px-3 py-3 hover:bg-line ${
-                    item.pagina ? "font-semibold text-accent" : "text-paper/90"
+                    item.destaque ? "font-semibold text-accent" : "text-paper/90"
                   }`}
                 >
                   {item.label}

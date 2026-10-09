@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ArquitetosRouteImport } from './routes/arquitetos'
 import { Route as EnterpriseRouteImport } from './routes/enterprise'
 import { Route as PoliticaDePrivacidadeRouteImport } from './routes/politica-de-privacidade'
+import { Route as SolucoesRouteImport } from './routes/solucoes'
 import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as ApiNovoLeadRouteImport } from './routes/api.novo-lead'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArquitetosRoute = ArquitetosRouteImport.update({
+  id: '/arquitetos',
+  path: '/arquitetos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnterpriseRoute = EnterpriseRouteImport.update({
@@ -28,6 +35,11 @@ const EnterpriseRoute = EnterpriseRouteImport.update({
 const PoliticaDePrivacidadeRoute = PoliticaDePrivacidadeRouteImport.update({
   id: '/politica-de-privacidade',
   path: '/politica-de-privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolucoesRoute = SolucoesRouteImport.update({
+  id: '/solucoes',
+  path: '/solucoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
@@ -43,23 +55,29 @@ const ApiNovoLeadRoute = ApiNovoLeadRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/arquitetos': typeof ArquitetosRoute
   '/enterprise': typeof EnterpriseRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
+  '/solucoes': typeof SolucoesRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/api/novo-lead': typeof ApiNovoLeadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/arquitetos': typeof ArquitetosRoute
   '/enterprise': typeof EnterpriseRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
+  '/solucoes': typeof SolucoesRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/api/novo-lead': typeof ApiNovoLeadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/arquitetos': typeof ArquitetosRoute
   '/enterprise': typeof EnterpriseRoute
   '/politica-de-privacidade': typeof PoliticaDePrivacidadeRoute
+  '/solucoes': typeof SolucoesRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/api/novo-lead': typeof ApiNovoLeadRoute
 }
@@ -67,30 +85,38 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/arquitetos'
     | '/enterprise'
     | '/politica-de-privacidade'
+    | '/solucoes'
     | '/termos-de-uso'
     | '/api/novo-lead'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/arquitetos'
     | '/enterprise'
     | '/politica-de-privacidade'
+    | '/solucoes'
     | '/termos-de-uso'
     | '/api/novo-lead'
   id:
     | '__root__'
     | '/'
+    | '/arquitetos'
     | '/enterprise'
     | '/politica-de-privacidade'
+    | '/solucoes'
     | '/termos-de-uso'
     | '/api/novo-lead'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArquitetosRoute: typeof ArquitetosRoute
   EnterpriseRoute: typeof EnterpriseRoute
   PoliticaDePrivacidadeRoute: typeof PoliticaDePrivacidadeRoute
+  SolucoesRoute: typeof SolucoesRoute
   TermosDeUsoRoute: typeof TermosDeUsoRoute
   ApiNovoLeadRoute: typeof ApiNovoLeadRoute
 }
@@ -102,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arquitetos': {
+      id: '/arquitetos'
+      path: '/arquitetos'
+      fullPath: '/arquitetos'
+      preLoaderRoute: typeof ArquitetosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/enterprise': {
@@ -116,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/politica-de-privacidade'
       fullPath: '/politica-de-privacidade'
       preLoaderRoute: typeof PoliticaDePrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solucoes': {
+      id: '/solucoes'
+      path: '/solucoes'
+      fullPath: '/solucoes'
+      preLoaderRoute: typeof SolucoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/termos-de-uso': {
@@ -137,8 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArquitetosRoute: ArquitetosRoute,
   EnterpriseRoute: EnterpriseRoute,
   PoliticaDePrivacidadeRoute: PoliticaDePrivacidadeRoute,
+  SolucoesRoute: SolucoesRoute,
   TermosDeUsoRoute: TermosDeUsoRoute,
   ApiNovoLeadRoute: ApiNovoLeadRoute,
 }

@@ -1,5 +1,5 @@
 import { Fio } from "@/components/animated-icons";
-import { CountUp, Section, SectionHead } from "@/components/ui-bits";
+import { CountUp, Section } from "@/components/ui-bits";
 
 const TIME = [
   {
@@ -21,7 +21,7 @@ const TIME = [
     ],
   },
   {
-    foto: null as string | null,
+    foto: "/marcos-schneider.jpg" as string | null,
     iniciais: "MS",
     nome: "Marcos Schneider",
     cargo: "COO",
@@ -37,15 +37,9 @@ const TIME = [
   },
 ];
 
-export function Time() {
+export function Arquitetos() {
   return (
-    <Section id="time">
-      <SectionHead
-        eyebrow="Quem comanda o laboratório"
-        title="Dois territórios, um objetivo: receita previsível"
-        lead="A Écsilab junta duas formas complementares de enxergar o crescimento: a engenharia dos processos e a lógica dos números do negócio."
-      />
-
+    <Section id="arquitetos">
       <div className="space-y-16 md:space-y-28">
         {TIME.map((s, i) => (
           <article

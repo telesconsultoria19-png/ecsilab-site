@@ -69,9 +69,10 @@ export function Gargalos() {
             </p>
           </div>
           <p className="border-l-2 border-accent pl-5 text-paper">
-            Injetar tráfego sem entender onde está o gargalo é rasgar dinheiro. Consertamos o fluxo
-            primeiro e aceleramos em seguida. Acelerar no rumo errado só serve para se perder mais
-            rápido.
+            Injetar tráfego sem entender onde está o gargalo é rasgar dinheiro. Diagnosticamos o fluxo
+            primeiro, identificando o que trava o seu ganho de dinheiro. Atuamos para quebrar a
+            restrição do sistema e só então aceleramos. Acelerar no rumo errado só serve para se
+            perder mais rápido.
           </p>
         </div>
       </div>
