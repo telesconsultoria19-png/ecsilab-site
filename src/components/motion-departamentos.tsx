@@ -2,22 +2,21 @@ import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Hero do Enterprise: a rede de departamentos.
+ * Hero do Enterprise: um hub de conexões.
  *
- * Dez departamentos em volta de um núcleo (a sua empresa). Num primeiro ciclo, a ovelha da Écsilab percorre a rede
- * acendendo cada departamento e, ao fim, entra no núcleo e sai de cena: a rede segue rodando sozinha, com bolinhas
- * trocando informações entre os departamentos. Nos ciclos seguintes, ela volta, amplia um departamento diferente
- * a cada vez e sai de novo. O movimento nunca para (loop de 16 s), mas pode ser pausado.
- *
- * Ciclo 0:  0,5 s a ovelha começa a ligar a rede · 7,2 s entra no núcleo e some · 7,5 s a rede roda sozinha
- * Ciclos 1+: 0,6 s a ovelha vai até um departamento · 1,8–3,4 s o amplia · 4,9 s some · rede rodando
+ * Dez departamentos, em duas colunas de cartões, ligados por fios finos a um núcleo central: a sua empresa. No primeiro
+ * ciclo, a ovelha da Écsilab conecta um departamento de cada vez ao núcleo, depois sai de cena e a rede segue sozinha,
+ * com pulsos de luz indo e vindo pelos fios. Nos ciclos seguintes, ela volta, amplia um departamento diferente a cada
+ * vez e sai de novo. Loop de 16 s, que nunca para (mas pode ser pausado).
  */
 
-// Palco de projeto: 1000 x 1000, escalado para o tamanho real.
+// Palco de projeto: 1000 x 780, escalado para o tamanho real.
 const W = 1000;
+const H = 780;
 const CX = 500;
-const CY = 455;
-const R = 268;
+const CY = 326;
+const CARD_W = 304;
+const CARD_H = 78;
 const N = 10;
 const CICLO = 16;
 const AMARELO = "253,202,10";
@@ -34,65 +33,23 @@ const DEPARTAMENTOS = [
   "Saúde & Estética",
   "E-commerce",
 ];
+// A ovelha liga um cartão da esquerda e um da direita, alternando, de cima para baixo.
+const ORDEM = [0, 5, 1, 6, 2, 7, 3, 8, 4, 9];
 
 // ---------- geometria ----------
-const angulo = (i: number) => (i * 2 * Math.PI) / N;
-const noPos = (i: number): [number, number] => [
-  CX + R * Math.sin(angulo(i)),
-  CY - R * Math.cos(angulo(i)),
+const lado = (i: number) => (i < 5 ? -1 : 1); // -1 = coluna da esquerda, 1 = coluna da direita
+const linha = (i: number) => i % 5;
+const cardCentro = (i: number): [number, number] => [
+  lado(i) < 0 ? 20 + CARD_W / 2 : W - 20 - CARD_W / 2,
+  70 + linha(i) * 128,
 ];
+/** A "porta" do cartão: o ponto da borda de onde o fio sai, virado para o núcleo. */
+const porta = (i: number): [number, number] => {
+  const [x, y] = cardCentro(i);
+  return [x - lado(i) * (CARD_W / 2), y]; // coluna da esquerda: borda direita; da direita: borda esquerda
+};
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 
-// Cada fio do núcleo ao departamento passa por dois pontos intermediários que balançam devagar (como num ecossistema vivo).
-const FIO = (() => {
-  const r = semente(5);
-  return Array.from({ length: N }, () => ({
-    d1: 0.33 + r() * 0.1,
-    d2: 0.62 + r() * 0.1,
-    o1: (r() - 0.5) * 70,
-    o2: (r() - 0.5) * 70,
-    fase: r() * Math.PI * 2,
-  }));
-})();
-let deriva = 0; // relógio do balanço dos fios (atualizado a cada quadro)
-
-/** Do núcleo (s = 0) ao departamento i (s = 1), passando pelos pontos intermediários. */
-const raio = (i: number, s: number): [number, number] => {
-  const [x, y] = noPos(i);
-  const f = FIO[i]!;
-  const dx = x - CX;
-  const dy = y - CY;
-  const len = Math.hypot(dx, dy) || 1;
-  const px = -dy / len;
-  const py = dx / len;
-  const a1 = f.o1 + Math.sin(deriva * 0.8 + f.fase) * 9;
-  const a2 = f.o2 + Math.cos(deriva * 0.8 + f.fase) * 9;
-  const p1: [number, number] = [CX + dx * f.d1 + px * a1, CY + dy * f.d1 + py * a1];
-  const p2: [number, number] = [CX + dx * f.d2 + px * a2, CY + dy * f.d2 + py * a2];
-  if (s <= f.d1) {
-    const k = s / f.d1;
-    return [lerp(CX, p1[0], k), lerp(CY, p1[1], k)];
-  }
-  if (s <= f.d2) {
-    const k = (s - f.d1) / (f.d2 - f.d1);
-    return [lerp(p1[0], p2[0], k), lerp(p1[1], p2[1], k)];
-  }
-  const k = (s - f.d2) / (1 - f.d2);
-  return [lerp(p2[0], x, k), lerp(p2[1], y, k)];
-};
-/** Do departamento i (s = 0) ao seguinte (s = 1), em curva puxada para o centro. */
-const anel = (i: number, s: number): [number, number] => {
-  const [x0, y0] = noPos(i);
-  const [x1, y1] = noPos((i + 1) % N);
-  const mx = (x0 + x1) / 2;
-  const my = (y0 + y1) / 2;
-  const cx = mx + (CX - mx) * 0.32;
-  const cy = my + (CY - my) * 0.32;
-  const u = 1 - s;
-  return [u * u * x0 + 2 * u * s * cx + s * s * x1, u * u * y0 + 2 * u * s * cy + s * s * y1];
-};
-
-// ---------- utilidades ----------
 function semente(n: number) {
   let a = n >>> 0;
   return () => {
@@ -112,40 +69,55 @@ const vaiEVolta = (t: number) => {
   const x = clamp01(t);
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 };
-const saiRapido = (t: number) => 1 - Math.pow(1 - clamp01(t), 3);
 const cresce = (t: number) => {
-  // entra com um leve excesso, como uma mola
   const x = clamp01(t);
   const c1 = 1.70158;
   return 1 + (c1 + 1) * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
 };
 
+// Cada fio sai do núcleo, faz uma curva suave e chega à porta do cartão; os pontos de controle balançam devagar.
+const FIO = (() => {
+  const r = semente(9);
+  return Array.from({ length: N }, () => ({
+    o1: (r() - 0.5) * 120,
+    o2: (r() - 0.5) * 120,
+    fase: r() * Math.PI * 2,
+  }));
+})();
+let deriva = 0;
+
+/** Do núcleo (s = 0) ao cartão i (s = 1), em curva de Bézier cúbica. */
+const raio = (i: number, s: number): [number, number] => {
+  const [px, py] = porta(i);
+  const f = FIO[i]!;
+  const d = lado(i);
+  const a1 = f.o1 + Math.sin(deriva * 0.7 + f.fase) * 14;
+  const a2 = f.o2 + Math.cos(deriva * 0.6 + f.fase) * 14;
+  const c1x = CX + d * 120;
+  const c1y = CY + a1;
+  const c2x = px - d * 130;
+  const c2y = py + a2;
+  const u = 1 - s;
+  return [
+    u * u * u * CX + 3 * u * u * s * c1x + 3 * u * s * s * c2x + s * s * s * px,
+    u * u * u * CY + 3 * u * u * s * c1y + 3 * u * s * s * c2y + s * s * s * py,
+  ];
+};
+
 // ---------- roteiro ----------
-const T_CHEGADA = (i: number) => 0.5 + 0.6 * (i + 1); // ciclo 0: quando a ovelha chega ao departamento i (0,5 + 0,6 · (i+1))
-const T_NUCLEO = 7.2; // ciclo 0: ovelha entra no núcleo
+const T_INICIO = (k: number) => 0.7 + 0.55 * k; // quando o fio da posição k na ordem começa a crescer
+const T_FIM_FIOS = T_INICIO(N - 1) + 0.5;
+const T_SAI = T_FIM_FIOS + 0.5; // a ovelha deixa o núcleo
 const departamentoAmpliado = (ciclo: number) => (ciclo * 3 + 2) % N;
 
 type Ponto2 = [number, number];
 /** Posição e transparência da ovelha em (ciclo, instante do ciclo). Nula quando ela não está em cena. */
-function ovelhaEm(
-  ciclo: number,
-  tl: number,
-): { p: Ponto2; a: number; e: number; ampliando: number } | null {
+function ovelhaEm(ciclo: number, tl: number): { p: Ponto2; a: number; ampliando: number } | null {
   if (ciclo === 0) {
-    if (tl < 0.3 || tl > 7.5) return null;
-    const entra = suave(0.3, 0.6, tl);
-    const sai = 1 - suave(7.2, 7.5, tl);
-    let p: Ponto2 = [CX, CY];
-    if (tl < 1.1) p = raio(0, vaiEVolta((tl - 0.5) / 0.6));
-    else if (tl < T_CHEGADA(9)) {
-      const i = Math.min(8, Math.floor((tl - T_CHEGADA(0)) / 0.6));
-      p = anel(i, vaiEVolta((tl - T_CHEGADA(i)) / 0.6));
-    } else if (tl <= T_NUCLEO) {
-      const [x, y] = noPos(9);
-      const k = vaiEVolta((tl - T_CHEGADA(9)) / (T_NUCLEO - T_CHEGADA(9)));
-      p = [lerp(x, CX, k), lerp(y, CY, k)];
-    }
-    return { p, a: entra * sai, e: 1, ampliando: 0 };
+    if (tl < 0.2 || tl > T_SAI + 0.4) return null;
+    const entra = suave(0.2, 0.6, tl);
+    const sai = 1 - suave(T_SAI - 0.2, T_SAI + 0.4, tl);
+    return { p: [CX, CY - 4], a: entra * sai, ampliando: 0 };
   }
   const k = departamentoAmpliado(ciclo);
   if (tl < 0.4 || tl > 5.0) return null;
@@ -156,15 +128,15 @@ function ovelhaEm(
   else if (tl < 3.4) p = raio(k, 1);
   else p = raio(k, 1 - vaiEVolta((tl - 3.4) / 1.2));
   const ampliando = suave(1.8, 2.1, tl) * (1 - suave(3.1, 3.4, tl));
-  return { p, a: entra * sai, e: 1, ampliando };
+  return { p, a: entra * sai, ampliando };
 }
 
 type Legenda = { partes: Array<{ t: string; d?: boolean }>; ini: number; fim: number };
 const legendasDoCiclo = (ciclo: number): Legenda[] =>
   ciclo === 0
     ? [
-        { partes: [{ t: "A Écsilab " }, { t: "tece.", d: true }], ini: 0.3, fim: 7.3 },
-        { partes: [{ t: "E deixa " }, { t: "rodando.", d: true }], ini: 7.7, fim: 12.5 },
+        { partes: [{ t: "A Écsilab " }, { t: "conecta.", d: true }], ini: 0.3, fim: T_SAI + 0.2 },
+        { partes: [{ t: "E deixa " }, { t: "rodando.", d: true }], ini: T_SAI + 0.6, fim: 12.5 },
         { partes: [{ t: "Em nome da " }, { t: "sua empresa.", d: true }], ini: 12.9, fim: 16 },
       ]
     : [
@@ -173,9 +145,8 @@ const legendasDoCiclo = (ciclo: number): Legenda[] =>
         { partes: [{ t: "Em nome da " }, { t: "sua empresa.", d: true }], ini: 11.4, fim: 16 },
       ];
 
-// ---------- simulação (o que se move sozinho: bolinhas e brilhos) ----------
-type Trecho = { f: (s: number) => Ponto2; dur: number };
-type Bolinha = { caminho: Trecho[]; trecho: number; s: number; destino: number; rastro: Ponto2[] };
+// ---------- simulação (o que se move sozinho: pacotes de luz e brilhos) ----------
+type Pacote = { j: number; u: number; saida: boolean };
 
 function criarSim() {
   const rnd = semente(21);
@@ -183,67 +154,29 @@ function criarSim() {
     t: 0,
     ciclo: 0,
     tl: 0,
-    bolinhas: [] as Bolinha[],
+    pacotes: [] as Pacote[],
     brilho: new Array<number>(N + 1).fill(0), // N = núcleo
     acc: 0,
   };
-
-  const rodando = () => (s.ciclo === 0 ? s.tl > 7.6 : s.tl > 5.2);
-
-  const novoEvento = () => {
-    const a = Math.floor(rnd() * N);
-    let b = Math.floor(rnd() * N);
-    if (b === a) b = (a + 1) % N;
-    let caminho: Trecho[];
-    if (rnd() < 0.5) {
-      // vizinho de anel
-      if (rnd() < 0.5) {
-        b = (a + 1) % N;
-        caminho = [{ f: (u) => anel(a, u), dur: 0.95 }];
-      } else {
-        b = (a + N - 1) % N;
-        caminho = [{ f: (u) => anel(b, 1 - u), dur: 0.95 }];
-      }
-    } else {
-      caminho = [
-        { f: (u) => raio(a, 1 - u), dur: 0.8 },
-        { f: (u) => raio(b, u), dur: 0.8 },
-      ];
-    }
-    s.bolinhas.push({ caminho, trecho: 0, s: 0, destino: b, rastro: [] });
-  };
+  const rodando = () => (s.ciclo === 0 ? s.tl > T_SAI + 0.4 : s.tl > 5.2 || s.tl < 0.4);
 
   const passo = (dt: number) => {
     s.t += dt;
     s.ciclo = Math.floor(s.t / CICLO);
     s.tl = s.t - s.ciclo * CICLO;
-
     if (rodando()) {
-      s.acc += dt * 1.7;
+      s.acc += dt * 1.15;
       while (s.acc >= 1) {
         s.acc -= 1;
-        if (s.bolinhas.length < 9) novoEvento();
+        if (s.pacotes.length < 6)
+          s.pacotes.push({ j: Math.floor(rnd() * N), u: 0, saida: rnd() < 0.5 });
       }
     }
-    for (const b of s.bolinhas) {
-      const tr = b.caminho[b.trecho];
-      if (!tr) continue;
-      b.s += dt / tr.dur;
-      b.rastro.push(tr.f(Math.min(1, b.s)));
-      if (b.rastro.length > 7) b.rastro.shift();
-      if (b.s >= 1) {
-        // chegou ao fim do trecho; se passa pelo núcleo, ele brilha
-        if (b.trecho < b.caminho.length - 1) s.brilho[N] = 1;
-        b.trecho += 1;
-        b.s = 0;
-      }
-    }
-    // chegadas
-    for (const b of s.bolinhas) if (b.trecho >= b.caminho.length) s.brilho[b.destino] = 1;
-    s.bolinhas = s.bolinhas.filter((b) => b.trecho < b.caminho.length);
+    for (const p of s.pacotes) p.u += dt / 1.0;
+    for (const p of s.pacotes) if (p.u >= 1) s.brilho[p.saida ? p.j : N] = 1;
+    s.pacotes = s.pacotes.filter((p) => p.u < 1);
     for (let i = 0; i <= N; i++) s.brilho[i] = Math.max(0, (s.brilho[i] ?? 0) - dt * 1.9);
   };
-
   return { s, passo };
 }
 
@@ -273,6 +206,7 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
     ovelha.src = "/ovelha.png";
 
     let cw = 0;
+    let ch = 0;
     let dpr = 1;
     let sc = 1;
     let raf = 0;
@@ -280,259 +214,202 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
     let anterior = 0;
     let visivel = false;
     let pausadoUsuario = reduzir;
-    let rotulos: Array<{ nome: string; x0: number; x1: number; y0: number; y1: number }> = [];
 
     const dimensionar = () => {
       cw = palco.clientWidth;
+      ch = (cw * H) / W;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(cw * dpr);
-      canvas.height = Math.round(cw * dpr);
+      canvas.height = Math.round(ch * dpr);
       sc = cw / W;
     };
-
     const X = (v: number) => v * sc;
 
-    /** Estado de cada departamento no instante atual: aceso (0..1) e progresso dos fios. */
-    const estadoDaRede = (ciclo: number, tl: number) => {
-      const aceso = new Array<number>(N).fill(1);
-      const raioProg = new Array<number>(N).fill(1);
-      const anelProg = new Array<number>(N).fill(1);
-      let nucleo = 1;
-      if (ciclo === 0) {
-        for (let i = 0; i < N; i++) {
-          const t0 = T_CHEGADA(i);
-          aceso[i] = cresce((tl - t0) / 0.45);
-          if (tl < t0) aceso[i] = 0;
-          raioProg[i] = clamp01((tl - t0) / 0.5);
-          anelProg[i] =
-            i === 0 ? clamp01((tl - T_CHEGADA(9) - 0.1) / 0.5) : clamp01((tl - T_CHEGADA(i)) / 0.6);
-        }
-        nucleo = tl < T_NUCLEO ? 0 : cresce((tl - T_NUCLEO) / 0.6);
-      }
-      return { aceso, raioProg, anelProg, nucleo };
+    const retangulo = (x: number, y: number, w: number, h: number, r: number) => {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
     };
 
-    const texto = (
-      t: string,
-      x: number,
-      y: number,
-      fonte: number,
-      cor: string,
-      alinhar: CanvasTextAlign,
-      peso = 600,
-    ) => {
-      ctx.font = `${peso} ${fonte}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-      ctx.fillStyle = cor;
-      ctx.textAlign = alinhar;
-      ctx.textBaseline = "middle";
-      ctx.fillText(t, x, y);
+    /** Estado de cada fio e cartão no instante atual: aceso (0..1) e progresso do fio. */
+    const estadoDaRede = (ciclo: number, tl: number) => {
+      const fio = new Array<number>(N).fill(1);
+      const aceso = new Array<number>(N).fill(1);
+      let nucleo = 1;
+      if (ciclo === 0) {
+        ORDEM.forEach((i, k) => {
+          const t0 = T_INICIO(k);
+          fio[i] = suave(t0, t0 + 0.5, tl);
+          aceso[i] = tl < t0 + 0.5 ? 0 : cresce((tl - t0 - 0.5) / 0.45);
+        });
+        nucleo = tl < T_SAI ? 0.25 : 0.25 + 0.75 * cresce((tl - T_SAI) / 0.6);
+      }
+      return { fio, aceso, nucleo };
     };
 
     const desenhar = () => {
       const { s } = sim;
       const { ciclo, tl } = s;
+      deriva = s.t;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, cw, cw);
+      ctx.clearRect(0, 0, cw, ch);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      deriva = s.t;
       const rede = estadoDaRede(ciclo, tl);
       const ov = ovelhaEm(ciclo, tl);
-      rotulos = [];
+      const emOperacao = ciclo > 0 || tl > T_SAI + 0.4;
 
-      // ---- fios ----
-      // fio de lã: duas pontas trançadas em torno do caminho
-      const fio = (pts: Ponto2[], prog: number, forte: number) => {
-        if (prog <= 0) return;
-        const n = Math.max(2, Math.round(prog * pts.length));
-        ctx.lineWidth = Math.max(1.2, X(3));
-        for (const [fase, alfa] of [
-          [0, 0.5],
-          [Math.PI, 0.36],
-        ] as const) {
-          ctx.beginPath();
-          for (let k = 0; k < n; k++) {
-            const p = pts[k];
-            const a0 = pts[Math.max(0, k - 1)];
-            const a1 = pts[Math.min(pts.length - 1, k + 1)];
-            if (!p || !a0 || !a1) continue;
-            const dx = a1[0] - a0[0];
-            const dy = a1[1] - a0[1];
-            const len = Math.hypot(dx, dy) || 1;
-            const off = Math.sin(k * 0.75 + fase) * 4.5;
-            const x = X(p[0] - (dy / len) * off);
-            const y = X(p[1] + (dx / len) * off);
-            if (k === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.strokeStyle = `rgba(${AMARELO},${alfa + 0.3 * forte})`;
-          ctx.stroke();
-        }
-      };
-      /** Novelo de lã: bola amarela com voltas de fio por cima. */
-      const novelo = (x: number, y: number, r: number, k: number) => {
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${AMARELO},${0.95 * k})`;
-        ctx.fill();
-        if (k > 0.4) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(x, y, r, 0, Math.PI * 2);
-          ctx.clip();
-          ctx.strokeStyle = "rgba(0,0,0,0.42)";
-          ctx.lineWidth = Math.max(1, r * 0.1);
-          for (const rot of [0.5, -0.7, 1.6]) {
-            ctx.beginPath();
-            ctx.ellipse(x, y, r * 1.15, r * 0.5, rot, 0, Math.PI * 2);
-            ctx.stroke();
-          }
-          ctx.restore();
-        }
-        ctx.lineWidth = Math.max(1.2, X(2.4));
-        ctx.strokeStyle = k > 0.5 ? `rgba(${AMARELO},1)` : "rgba(255,255,255,0.3)";
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.stroke();
-      };
+      // ---- fios (finos, como num diagrama de conexões) ----
       for (let i = 0; i < N; i++) {
-        const pts: Ponto2[] = [];
-        for (let k = 0; k <= 40; k++) pts.push(raio(i, k / 40));
-        fio(pts, rede.raioProg[i] ?? 0, s.brilho[i] ?? 0);
-        const pa: Ponto2[] = [];
-        for (let k = 0; k <= 40; k++) pa.push(anel(i, k / 40));
-        fio(pa, rede.anelProg[i] ?? 0, Math.max(s.brilho[i] ?? 0, s.brilho[(i + 1) % N] ?? 0));
-      }
-
-      // ---- bolinhas em movimento ----
-      for (const b of s.bolinhas) {
-        const tr = b.caminho[b.trecho];
-        if (!tr) continue;
-        b.rastro.forEach((p, k) => {
-          const a = ((k + 1) / b.rastro.length) * 0.5;
-          ctx.fillStyle = `rgba(${AMARELO},${a})`;
-          ctx.beginPath();
-          ctx.arc(
-            X(p[0]),
-            X(p[1]),
-            Math.max(1.2, X(4.2)) * ((k + 1) / b.rastro.length),
-            0,
-            Math.PI * 2,
-          );
-          ctx.fill();
-        });
-        const p = tr.f(Math.min(1, b.s));
-        ctx.shadowBlur = 14;
-        ctx.shadowColor = `rgb(${AMARELO})`;
-        ctx.fillStyle = `rgb(${AMARELO})`;
+        const prog = rede.fio[i] ?? 0;
+        if (prog <= 0.001) continue;
+        const forte = Math.max(
+          s.brilho[i] ?? 0,
+          ov && ciclo > 0 && departamentoAmpliado(ciclo) === i ? ov.ampliando : 0,
+        );
         ctx.beginPath();
-        ctx.arc(X(p[0]), X(p[1]), Math.max(2, X(7)), 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      // ---- pulsos contínuos: uma luz volta de cada departamento ao núcleo, sem parar ----
-      if (ciclo > 0 || tl > 7.6) {
-        for (let i = 0; i < N; i++) {
-          const u = (s.t * 0.3 + FIO[i]!.fase / (Math.PI * 2)) % 1;
-          const p = raio(i, 1 - u);
-          ctx.shadowBlur = 10;
-          ctx.shadowColor = "rgba(255,255,255,0.8)";
-          ctx.fillStyle = "rgba(255,255,255,0.92)";
+        const passos = 44;
+        const n = Math.max(2, Math.round(passos));
+        for (let k = 0; k <= n; k++) {
+          const [x, y] = raio(i, (k / passos) * prog);
+          if (k === 0) ctx.moveTo(X(x), X(y));
+          else ctx.lineTo(X(x), X(y));
+        }
+        ctx.strokeStyle =
+          forte > 0.02 ? `rgba(${AMARELO},${0.2 + 0.55 * forte})` : "rgba(255,255,255,0.24)";
+        ctx.lineWidth = Math.max(1, X(forte > 0.02 ? 3 : 2));
+        ctx.stroke();
+        // pontos de interseção ao longo do fio
+        if (prog >= 1) {
+          for (const u of [0.34, 0.68]) {
+            const [x, y] = raio(i, u);
+            ctx.beginPath();
+            ctx.arc(X(x), X(y), Math.max(1.4, X(4)), 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.28)";
+            ctx.fill();
+          }
+        }
+        // a ponta do fio que cresce, com um brilho
+        if (prog < 1) {
+          const [x, y] = raio(i, prog);
+          ctx.shadowBlur = 14;
+          ctx.shadowColor = `rgb(${AMARELO})`;
+          ctx.fillStyle = `rgb(${AMARELO})`;
           ctx.beginPath();
-          ctx.arc(X(p[0]), X(p[1]), Math.max(1.6, X(4.2)), 0, Math.PI * 2);
+          ctx.arc(X(x), X(y), Math.max(2, X(7)), 0, Math.PI * 2);
           ctx.fill();
           ctx.shadowBlur = 0;
         }
       }
 
-      // ---- núcleo (a sua empresa) ----
-      {
-        const k = rede.nucleo;
-        const pulso = 0.5 + 0.5 * Math.sin(s.t * 2);
-        const r = X(36) * (0.9 + 0.1 * k);
-        if (k > 0.02) {
-          const g = ctx.createRadialGradient(X(CX), X(CY), 0, X(CX), X(CY), X(120));
-          g.addColorStop(
-            0,
-            `rgba(${AMARELO},${(0.2 + 0.1 * pulso + 0.35 * (s.brilho[N] ?? 0)) * k})`,
-          );
-          g.addColorStop(1, `rgba(${AMARELO},0)`);
-          ctx.fillStyle = g;
-          ctx.fillRect(X(CX - 120), X(CY - 120), X(240), X(240));
+      // ---- pulsos: uma luz branca volta de cada cartão ao núcleo, sem parar; pacotes amarelos saem e entram ----
+      if (emOperacao) {
+        for (let i = 0; i < N; i++) {
+          const u = (s.t * 0.3 + FIO[i]!.fase / (Math.PI * 2)) % 1;
+          const [x, y] = raio(i, 1 - u);
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = "rgba(255,255,255,0.8)";
+          ctx.fillStyle = "rgba(255,255,255,0.92)";
+          ctx.beginPath();
+          ctx.arc(X(x), X(y), Math.max(1.6, X(5)), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
         }
-        novelo(X(CX), X(CY), r, k);
-        const fs = Math.max(10, X(23));
-        texto(
-          "SUA EMPRESA",
-          X(CX),
-          X(CY) + r + fs * 1.1,
-          fs,
-          k > 0.5 ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)",
-          "center",
-          700,
-        );
+        for (const p of s.pacotes) {
+          const [x, y] = raio(p.j, p.saida ? p.u : 1 - p.u);
+          ctx.shadowBlur = 16;
+          ctx.shadowColor = `rgb(${AMARELO})`;
+          ctx.fillStyle = `rgb(${AMARELO})`;
+          ctx.beginPath();
+          ctx.arc(X(x), X(y), Math.max(2, X(8)), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
       }
 
-      // ---- departamentos e nomes ----
-      const fs = Math.max(11.5, Math.min(18, X(26)));
-      for (let i = 0; i < N; i++) {
-        const [nx, ny] = noPos(i);
-        const k = rede.aceso[i] ?? 0;
-        const amp = ov && ciclo > 0 && departamentoAmpliado(ciclo) === i ? ov.ampliando : 0;
-        const r = X(17) * (0.55 + 0.45 * k) + X(5) * (s.brilho[i] ?? 0) + X(4) * amp;
-        if (k > 0.02 || amp > 0) {
-          const g = ctx.createRadialGradient(X(nx), X(ny), 0, X(nx), X(ny), X(52 + 30 * amp));
-          g.addColorStop(0, `rgba(${AMARELO},${0.28 * k + 0.4 * (s.brilho[i] ?? 0) + 0.45 * amp})`);
-          g.addColorStop(1, `rgba(${AMARELO},0)`);
-          ctx.fillStyle = g;
-          ctx.fillRect(X(nx - 90), X(ny - 90), X(180), X(180));
-        }
-        // anéis da ampliação
-        if (amp > 0.02 && ov) {
-          for (let q = 0; q < 2; q++) {
-            const ph = (s.t * 0.9 + q * 0.5) % 1;
+      // ---- núcleo (a sua empresa): ondas lentas saem dele, como de um hub ----
+      {
+        const k = rede.nucleo;
+        const pulso = s.t * 0.33;
+        if (emOperacao) {
+          for (let q = 0; q < 3; q++) {
+            const f = (pulso + q / 3) % 1;
             ctx.beginPath();
-            ctx.arc(X(nx), X(ny), X(20 + 46 * ph), 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(${AMARELO},${0.7 * (1 - ph) * amp})`;
-            ctx.lineWidth = Math.max(1, X(2.6));
+            ctx.arc(X(CX), X(CY), X(76 + f * 110), 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${AMARELO},${0.3 * (1 - f)})`;
+            ctx.lineWidth = Math.max(1, X(2));
             ctx.stroke();
           }
         }
-        novelo(X(nx), X(ny), r, k);
+        const g = ctx.createRadialGradient(X(CX), X(CY), 0, X(CX), X(CY), X(150));
+        g.addColorStop(0, `rgba(${AMARELO},${(0.12 + 0.3 * (s.brilho[N] ?? 0)) * k})`);
+        g.addColorStop(1, `rgba(${AMARELO},0)`);
+        ctx.fillStyle = g;
+        ctx.fillRect(X(CX - 150), X(CY - 150), X(300), X(300));
+        ctx.beginPath();
+        ctx.arc(X(CX), X(CY), X(76), 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(10,10,10,0.9)";
+        ctx.fill();
+        ctx.lineWidth = Math.max(1.4, X(3.5));
+        ctx.strokeStyle = `rgba(${AMARELO},${0.35 + 0.65 * k})`;
+        ctx.stroke();
+        if (!(ov && ciclo === 0 && ov.a > 0.2)) {
+          const fs = Math.max(10, X(25));
+          ctx.font = `800 ${fs}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = `rgba(255,255,255,${0.35 + 0.6 * k})`;
+          ctx.fillText("SUA", X(CX), X(CY) - fs * 0.62);
+          ctx.fillText("EMPRESA", X(CX), X(CY) + fs * 0.62);
+        }
+      }
 
-        // nome do departamento, em até duas linhas, do lado de fora do anel
-        const palavras = (DEPARTAMENTOS[i] ?? "").split(" ");
-        const linhas =
-          palavras.length > 1 && (DEPARTAMENTOS[i] ?? "").length > 9
-            ? [palavras[0] ?? "", palavras.slice(1).join(" ")]
-            : [DEPARTAMENTOS[i] ?? ""];
-        const sx = Math.sin(angulo(i));
-        const cy = -Math.cos(angulo(i));
-        const lado: CanvasTextAlign = sx > 0.35 ? "left" : sx < -0.35 ? "right" : "center";
-        const off = r + Math.max(8, X(14));
-        const bx = X(nx) + (lado === "left" ? off : lado === "right" ? -off : 0);
-        const by =
-          X(ny) +
-          (Math.abs(sx) <= 0.35
-            ? cy < 0
-              ? -off - fs * (linhas.length - 1) * 0.55
-              : off + fs * 0.4
-            : 0);
-        const cor = k > 0.5 ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.42)";
-        linhas.forEach((ln, q) => {
-          const yy = by + (q - (linhas.length - 1) / 2) * fs * 1.12;
-          texto(ln, bx, yy, fs, cor, lado, 700);
-          const w = ctx.measureText(ln).width;
-          const x0 = lado === "left" ? bx : lado === "right" ? bx - w : bx - w / 2;
-          rotulos.push({ nome: ln, x0, x1: x0 + w, y0: yy - fs / 2, y1: yy + fs / 2 });
-        });
+      // ---- cartões dos departamentos ----
+      for (let i = 0; i < N; i++) {
+        const [cx, cy] = cardCentro(i);
+        const k = rede.aceso[i] ?? 0;
+        const amp = ov && ciclo > 0 && departamentoAmpliado(ciclo) === i ? ov.ampliando : 0;
+        const forte = Math.max(s.brilho[i] ?? 0, amp);
+        const esc = 1 + 0.1 * amp;
+        const w = CARD_W * esc;
+        const h = CARD_H * esc;
+        ctx.save();
+        if (forte > 0.02) {
+          ctx.shadowBlur = 24 * forte;
+          ctx.shadowColor = `rgba(${AMARELO},0.8)`;
+        }
+        retangulo(X(cx - w / 2), X(cy - h / 2), X(w), X(h), X(20));
+        ctx.fillStyle = `rgba(255,255,255,${0.04 + 0.05 * k + 0.06 * forte})`;
+        ctx.fill();
+        ctx.restore();
+        retangulo(X(cx - w / 2), X(cy - h / 2), X(w), X(h), X(20));
+        ctx.lineWidth = Math.max(1, X(2.2));
+        ctx.strokeStyle =
+          k > 0.5 ? `rgba(${AMARELO},${0.5 + 0.5 * forte})` : "rgba(255,255,255,0.14)";
+        ctx.stroke();
+        // porta de conexão
+        const [px, py] = porta(i);
+        ctx.beginPath();
+        ctx.arc(X(px), X(py), Math.max(2, X(7)), 0, Math.PI * 2);
+        ctx.fillStyle = k > 0.5 ? `rgba(${AMARELO},1)` : "rgba(255,255,255,0.3)";
+        ctx.fill();
+        // nome
+        const fs = Math.max(10, X(28 * (1 + 0.06 * amp)));
+        ctx.font = `700 ${fs}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = k > 0.5 ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.4)";
+        ctx.fillText(DEPARTAMENTOS[i] ?? "", X(cx), X(cy));
       }
 
       // ---- ovelha ----
       if (ov && ov.a > 0.01 && ovelha.complete) {
         const [ox, oy] = ov.p;
-        const tam = X(78);
+        const tam = X(ciclo === 0 ? 120 : 84);
         const boba = Math.sin(s.t * 3.2) * X(3);
         ctx.globalAlpha = ov.a;
         ctx.shadowBlur = 26;
@@ -549,9 +426,9 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
         const op = suave(l.ini, l.ini + 0.6, tl) * (1 - suave(l.fim - 0.6, l.fim, tl));
         el.style.opacity = String(op);
         el.style.transform = `translateY(${(1 - op) * 8}px)`;
-        const [a, b] = l.partes;
-        if (a && b && el.dataset["ciclo"] !== String(ciclo === 0 ? 0 : 1)) {
-          el.dataset["ciclo"] = String(ciclo === 0 ? 0 : 1);
+        const chave = `${ciclo === 0 ? 0 : 1}-${q}`;
+        if (el.dataset["chave"] !== chave) {
+          el.dataset["chave"] = chave;
           el.innerHTML = "";
           for (const p of l.partes) {
             const sp = document.createElement("span");
@@ -590,7 +467,7 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
 
     atualizarRef.current = atualizar;
     dimensionar();
-    // primeira imagem: com "reduzir movimento", um quadro fixo da rede já pronta; sem isso, a abertura (ciclo 0)
+    // com "reduzir movimento", um quadro fixo da rede já pronta; sem isso, a abertura (ciclo 0)
     if (reduzir) {
       sim.s.t = CICLO + 12;
       for (let k = 0; k < 60 * 6; k++) sim.passo(1 / 60);
@@ -632,8 +509,7 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
           t: sim.s.t,
           ciclo: sim.s.ciclo,
           tl: sim.s.tl,
-          bolinhas: sim.s.bolinhas.length,
-          rotulos: rotulos.map((r) => ({ ...r })),
+          pacotes: sim.s.pacotes.length,
           largura: cw,
         }),
       };
@@ -651,8 +527,9 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
       <div
         ref={palcoRef}
         role="img"
-        aria-label="Animação em loop: a Écsilab tece um fio de lã ligando dez departamentos (vendas, marketing, atendimento e CS, financeiro, RH, conteúdo, jurídico, imobiliário, saúde e estética e e-commerce) a um núcleo que é a sua empresa. Depois a Écsilab sai de cena e a rede segue funcionando sozinha, em nome da sua empresa."
-        className={`relative aspect-square w-full transition-opacity duration-1000 ${ativo ? "opacity-100" : "opacity-0"}`}
+        aria-label="Animação em loop: a Écsilab conecta dez departamentos (vendas, marketing, atendimento e CS, financeiro, RH, conteúdo, jurídico, imobiliário, saúde e estética e e-commerce) a um núcleo que é a sua empresa. Depois a Écsilab sai de cena e a rede segue funcionando sozinha, em nome da sua empresa."
+        style={{ aspectRatio: `${W} / ${H}` }}
+        className={`relative w-full transition-opacity duration-1000 ${ativo ? "opacity-100" : "opacity-0"}`}
       >
         <canvas
           ref={canvasRef}
@@ -662,7 +539,7 @@ export function MotionDepartamentos({ ativo = true }: { ativo?: boolean }) {
 
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-[2%] px-3 text-center"
+          className="pointer-events-none absolute inset-x-0 bottom-[1%] px-3 text-center"
         >
           <div className="relative mx-auto h-[2.6em] max-w-md text-[clamp(16px,2.2vw,26px)] leading-tight">
             {[0, 1, 2].map((q) => (

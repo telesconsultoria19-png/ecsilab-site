@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react";
 const idDe = (href: string) => href.split("#")[1] ?? "";
 
 export const NAV: Array<{ href: string; label: string; pagina?: boolean; destaque?: boolean }> = [
+  { href: "/", label: "Home", pagina: true },
   { href: "/mentes", label: "Mentes", pagina: true },
   { href: "/#diagnostico", label: "Diagnóstico" },
   { href: "/#metodo", label: "Método" },
@@ -64,7 +65,11 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Principal">
           {NAV.map((item) => {
-            const atual = item.pagina ? caminho === item.href : ativa === idDe(item.href);
+            const atual = item.pagina
+              ? item.href === "/"
+                ? caminho === "/" && ativa === "" // a Home só fica marcada enquanto nenhuma seção abaixo está em foco
+                : caminho === item.href
+              : ativa === idDe(item.href);
             return (
               <a
                 key={item.href}
@@ -117,7 +122,11 @@ export function SiteHeader() {
                 <a
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  aria-current={item.pagina && caminho === item.href ? "page" : undefined}
+                  aria-current={
+                    item.pagina && caminho === item.href && (item.href !== "/" || ativa === "")
+                      ? "page"
+                      : undefined
+                  }
                   className={`block rounded-md px-3 py-3 hover:bg-line ${
                     item.destaque ? "font-semibold text-accent" : "text-paper/90"
                   }`}
