@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 
 type Dados = { w: number; h: number; p: number[] };
 
+/** Duração da construção da ovelha: o relógio é elevado a uma potência, então começa bem devagar e acelera. */
+const TEMPO_CONSTRUCAO = 10;
 const AMARELO = "253,202,10";
 const BRANCO = "255,255,255";
 
@@ -37,7 +39,11 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
     let n = 0;
     let nx: Float32Array, ny: Float32Array; // posição de repouso, em unidades da ovelha (-0.5 a 0.5)
     let x: Float32Array, y: Float32Array; // posição atual
-    let ang: Float32Array, rnd: Float32Array, asm: Float32Array, vel: Float32Array;
+    let ang: Float32Array,
+      rnd: Float32Array,
+      ini: Float32Array,
+      dur: Float32Array,
+      lim: Float32Array;
     let tipo: Uint8Array;
 
     const medir = () => {
@@ -57,6 +63,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
       const cx = cw / 2;
       const cy = ch / 2;
       const respira = 1 + Math.sin(tempo * 0.9) * 0.012;
+      const G = reduzir ? 1 : Math.min(1, Math.pow(tempo / TEMPO_CONSTRUCAO, 1.6));
 
       // dispersão ao rolar para além da hero
       const r = caixa.getBoundingClientRect();
@@ -99,11 +106,19 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
           ty += Math.sin(a) * disp * S * (0.3 + q * 0.7) - disp * S * 0.25;
         }
 
-        if (asm[i]! < 1) asm[i] = Math.min(1, asm[i]! + vel[i]! * dtq * 60);
-        const e = 1 - Math.pow(1 - asm[i]!, 3);
-        const k = reduzir ? 1 : 0.02 + e * 0.05;
-        x[i] = x[i]! + (tx - x[i]!) * k;
-        y[i] = y[i]! + (ty - y[i]!) * k;
+        // construção: começa devagar (poucas partículas, do rosto para a lã) e acelera até a ovelha estar completa
+        if (ini[i]! < 0 && G >= lim[i]!) ini[i] = tempo;
+        const asm = ini[i]! < 0 ? 0 : Math.min(1, (tempo - ini[i]!) / dur[i]!);
+        const e = 1 - Math.pow(1 - asm, 3);
+        if (ini[i]! < 0) {
+          // poeira: as partículas ainda soltas vagam de leve e quase não se veem
+          x[i] = x[i]! + Math.sin(tempo * 0.5 + a * 5) * 0.12;
+          y[i] = y[i]! + Math.cos(tempo * 0.4 + a * 3) * 0.12;
+        } else {
+          const k = reduzir ? 1 : 1 - Math.exp(-(1.4 + e * 3.2) * dtq);
+          x[i] = x[i]! + (tx - x[i]!) * k;
+          y[i] = y[i]! + (ty - y[i]!) * k;
+        }
 
         // o mouse empurra
         const mx = x[i]! - mouse.x;
@@ -119,7 +134,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
         const amarela = tipo[i] === 1;
         const alfa = Math.min(
           1,
-          ((amarela ? 0.85 : 0.62) + q * 0.3 + brilho * 0.5) * e * (1 - disp),
+          (((amarela ? 0.85 : 0.62) + q * 0.3 + brilho * 0.5) * e + 0.22 * (1 - e)) * (1 - disp),
         );
         if (alfa <= 0.01) continue;
         ctx.fillStyle = `rgba(${amarela ? AMARELO : BRANCO},${alfa})`;
@@ -166,8 +181,9 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
         y = new Float32Array(n);
         ang = new Float32Array(n);
         rnd = new Float32Array(n);
-        asm = new Float32Array(n);
-        vel = new Float32Array(n);
+        ini = new Float32Array(n);
+        dur = new Float32Array(n);
+        lim = new Float32Array(n);
         tipo = new Uint8Array(n);
         for (let i = 0; i < n; i++) {
           nx[i] = d.p[i * 3]! / d.w - 0.5;
@@ -177,8 +193,10 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
           rnd[i] = Math.random();
           x[i] = Math.random() * cw;
           y[i] = Math.random() * ch;
-          vel[i] = 0.0025 + Math.random() * 0.006;
-          asm[i] = reduzir ? 1 : 0;
+          dur[i] = 1.4 + Math.random() * 1.0;
+          ini[i] = reduzir ? 0 : -1;
+          // ordem de construção: do centro (rosto) para fora (lã), com um pouco de acaso
+          lim[i] = Math.min(1, Math.hypot(nx[i]!, ny[i]!) / 0.5) * 0.82 + Math.random() * 0.18;
           if (reduzir) {
             x[i] = cw / 2 + nx[i]! * Math.min(cw, ch) * 1.08;
             y[i] = ch / 2 + ny[i]! * Math.min(cw, ch) * 1.08;
