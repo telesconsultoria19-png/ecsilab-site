@@ -271,3 +271,21 @@ section[id] {
 @media (prefers-reduced-motion: reduce) {
   .nome-espelho { animation: none; background-position: 50% 0; }
 }
+
+/* Hero da Home: "moda" com brilho de revista, e "conta" carimbada */
+.moda-brilho {
+  background: linear-gradient(105deg, #bdbdc4 0%, #e9e9ee 38%, #ffffff 48%, #fff6c9 50%, #ffffff 52%, #e9e9ee 62%, #bdbdc4 100%);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: espelho 9s ease-in-out infinite;
+}
+@keyframes conta-carimbo {
+  0% { opacity: 0; transform: scale(1.9); filter: blur(10px); text-shadow: 0 0 0 rgba(253, 202, 10, 0); }
+  55% { opacity: 1; transform: scale(0.94); filter: blur(0); text-shadow: 0 0 40px rgba(253, 202, 10, 0.9); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); text-shadow: 0 0 22px rgba(253, 202, 10, 0.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moda-brilho { animation: none; background-position: 50% 0; }
+}

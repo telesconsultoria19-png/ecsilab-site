@@ -1,6 +1,5 @@
-import { ScrollWords } from "@/components/scroll-words";
 import { IconCorrente, IconOKR, IconScrum } from "@/components/animated-icons";
-import { Eyebrow, GlowCard, SectionHead, Section } from "@/components/ui-bits";
+import { GlowCard, SectionHead, Section } from "@/components/ui-bits";
 
 const PILARES = [
   {
@@ -40,46 +39,6 @@ const PILARES = [
     ],
   },
 ];
-
-/** A dura realidade do mercado: o problema que a Écsilab resolve. */
-export function Gargalos() {
-  return (
-    <section id="gargalos" className="relative overflow-hidden">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="pt-20 sm:pt-28">
-          <Eyebrow>A dura realidade do mercado</Eyebrow>
-          <ScrollWords
-            text="O marketing tradicional virou moda. E moda não paga conta."
-            accentFrom={5}
-            como="h1"
-            className="max-w-5xl text-4xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-8xl"
-          />
-        </div>
-
-        <div className="reveal mt-10 grid gap-8 pb-24 text-lg sm:mt-14 leading-relaxed text-paper/75 lg:grid-cols-2 lg:gap-16">
-          <div className="space-y-5">
-            <p>
-              Enquanto muita agência vende relatório de curtida e template de story, nós focamos no
-              que mantém a empresa viva:{" "}
-              <strong className="text-paper">processos previsíveis de crescimento</strong>.
-            </p>
-            <p>
-              Se o seu serviço já é validado, você não precisa de mais burocracia criativa. Precisa
-              de inteligência de mercado e de marketing e vendas que gerem aumento direto de
-              faturamento.
-            </p>
-          </div>
-          <p className="border-l-2 border-accent pl-5 text-paper">
-            Injetar tráfego sem entender onde está o gargalo é rasgar dinheiro. Diagnosticamos o fluxo
-            primeiro, identificando o que trava o seu ganho de dinheiro. Atuamos para quebrar a
-            restrição do sistema e só então aceleramos. Acelerar no rumo errado só serve para se
-            perder mais rápido.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /** Engenharia de processos e growth: o motor de operação (OKR, Scrum e Teoria das Restrições). */
 export function Metodo() {
