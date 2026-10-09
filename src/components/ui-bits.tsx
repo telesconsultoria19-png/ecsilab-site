@@ -31,10 +31,14 @@ export function Section({
   );
 }
 
-export function Eyebrow({ children }: { children: ReactNode }) {
+export function Eyebrow({ children, claro = false }: { children: ReactNode; claro?: boolean }) {
   return (
-    <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-accent">
-      <span className="eyebrow-line h-px w-8 bg-gradient-to-r from-transparent to-accent shadow-[0_0_10px_#fdca0a]" />
+    <p
+      className={`mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] ${claro ? "text-[#8a6300]" : "text-accent"}`}
+    >
+      <span
+        className={`eyebrow-line h-px w-8 bg-gradient-to-r from-transparent ${claro ? "to-[#8a6300]" : "to-accent shadow-[0_0_10px_#fdca0a]"}`}
+      />
       {children}
     </p>
   );
@@ -140,7 +144,10 @@ export function CountUp({
   return (
     <span ref={ref}>
       {prefix}
-      {n.toLocaleString("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
+      {n.toLocaleString("pt-BR", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}
       {suffix}
     </span>
   );
@@ -158,7 +165,10 @@ export function Field({ label, children }: { label: string; children: ReactNode 
   );
 }
 
-export function PrimaryButton({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export function PrimaryButton({
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}

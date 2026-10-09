@@ -124,18 +124,14 @@ function Hero() {
   const bloco = "block w-fit max-w-full will-change-transform";
 
   return (
-    <section ref={secaoRef} className="relative overflow-hidden bg-black">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-ink"
-      />
+    <section ref={secaoRef} className="relative overflow-hidden bg-white text-black">
       <div className="relative z-10 mx-auto max-w-6xl px-4 pb-20 pt-20 sm:px-6 sm:pb-28 sm:pt-28">
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-6">
           <div>
             <div
               className={`transition-opacity duration-700 ${fase === "titulo" ? "opacity-0" : "opacity-100"}`}
             >
-              <Eyebrow>Écsilab Enterprise</Eyebrow>
+              <Eyebrow claro>Écsilab Enterprise</Eyebrow>
             </div>
             <h1 className="max-w-5xl text-4xl font-extrabold leading-[1.04] tracking-tight sm:text-5xl xl:text-6xl">
               <span
@@ -150,7 +146,7 @@ function Hero() {
                 ref={(el) => {
                   blocosRef.current[1] = el;
                 }}
-                className={`${bloco} shimmer-text`}
+                className={`${bloco} shimmer-text-claro`}
               >
                 A infraestrutura é sua,
               </span>
@@ -158,18 +154,18 @@ function Hero() {
                 ref={(el) => {
                   blocosRef.current[2] = el;
                 }}
-                className={`${bloco} shimmer-text`}
+                className={`${bloco} shimmer-text-claro`}
               >
                 para sempre.
               </span>
             </h1>
-            <p className="mt-8 max-w-3xl text-lg leading-relaxed text-paper/80 sm:text-xl">
+            <p className="mt-8 max-w-3xl text-lg leading-relaxed text-black/75 sm:text-xl">
               <span className="relative block">
                 <span className="opacity-0">{TEXTO_HERO}</span>
                 <span aria-hidden="true" className="absolute inset-0">
                   {TEXTO_HERO.slice(0, escrito)}
                   {!pronto && escrito > 0 && (
-                    <span className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] bg-accent" />
+                    <span className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[2px] bg-[#8a6300]" />
                   )}
                 </span>
               </span>
@@ -186,17 +182,17 @@ function Hero() {
               </a>
               <a
                 href="#departamentos"
-                className="rounded-xl bg-white/[0.06] px-7 py-4 text-center font-semibold text-paper backdrop-blur transition hover:bg-white/10 hover:text-accent"
+                className="rounded-xl bg-black/[0.06] px-7 py-4 text-center font-semibold text-black transition hover:bg-black/10 hover:text-[#8a6300]"
               >
                 Ver os departamentos
               </a>
             </div>
           </div>
-          <MotionDepartamentos ativo={animacao} />
+          <MotionDepartamentos ativo={animacao} tema="claro" />
         </div>
 
         <ul
-          className={`mt-14 grid gap-3 text-sm text-paper/85 sm:grid-cols-2 lg:grid-cols-4 ${revela}`}
+          className={`mt-14 grid gap-3 text-sm text-black/80 sm:grid-cols-2 lg:grid-cols-4 ${revela}`}
         >
           {[
             "Implantação sob medida",
@@ -205,7 +201,7 @@ function Hero() {
             "Documentação e treinamento da equipe",
           ].map((t) => (
             <li key={t} className="flex items-start gap-3">
-              <Check size={18} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
+              <Check size={18} className="mt-0.5 shrink-0 text-[#8a6300]" aria-hidden="true" />
               {t}
             </li>
           ))}
