@@ -1,16 +1,17 @@
 /**
  * Ponte entre a poeira cósmica da hero (ovelha de partículas) e a animação da Teoria das Restrições.
- * O tubo publica a posição de cada bolinha; a poeira, ao rolar a página, voa até essas posições e vira as bolinhas.
- * `vis` é o quanto as bolinhas do tubo já aparecem (0 = só a poeira, 1 = bolinhas normais).
+ * O tubo informa onde ficam a entrada e a saída dele; ao rolar a página, a poeira da hero é sugada para a entrada
+ * (ou sai pela saída, ao voltar) e `vis` diz o quanto o fluxo de poeira dentro do tubo já aparece (0 a 1).
  */
-export const MAX_BOLINHAS = 1400;
-
 export const fluxo = {
-  n: 0,
-  ids: new Int32Array(MAX_BOLINHAS),
-  /** posição no canvas do tubo (px CSS), relativa ao canto superior esquerdo do tubo */
-  xs: new Float32Array(MAX_BOLINHAS),
-  ys: new Float32Array(MAX_BOLINHAS),
-  raio: 3,
+  /** intensidade da poeira que corre no tubo (0 = tubo vazio, 1 = fluxo completo) */
   vis: 1,
+  /** entrada e saída do tubo, em px CSS relativos ao canto superior esquerdo do canvas do tubo */
+  entradaX: 0,
+  entradaY: 0,
+  saidaX: 0,
+  saidaY: 0,
+  /** meia-largura da primeira zona e raio de uma bolinha, em px */
+  larguraEntrada: 40,
+  raio: 3,
 };

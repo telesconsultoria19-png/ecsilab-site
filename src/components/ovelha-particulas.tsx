@@ -39,7 +39,11 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
       return t * t * (3 - 2 * t);
     };
     let tubo: HTMLElement | null = null;
-    let idBase = -1;
+    let via = 0; // caminho da poeira: 0 = sugada para a entrada do tubo, 1 = sai pela saída do tubo
+    let qAnterior = 0;
+    let sentido = 1; // 1 = descendo a página, -1 = subindo
+    let dW = 1;
+    let dH = 1;
     let limpo = true;
     let tempo = 0;
     let anterior = 0;
@@ -50,7 +54,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
     let n = 0;
     let nx: Float32Array, ny: Float32Array; // posição de repouso, em unidades da ovelha (-0.5 a 0.5)
     let x: Float32Array, y: Float32Array; // posição atual
-    let atrib: Uint32Array; // a qual bolinha do tubo cada partícula vira
+    let desl: Float32Array, lado: Float32Array; // atraso de cada partícula na migração e posição dentro do tubo
     let ang: Float32Array,
       rnd: Float32Array,
       ini: Float32Array,
@@ -97,12 +101,20 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
       const respira = 1 + Math.sin(tempo * 0.9) * 0.012;
       const G = reduzir ? 1 : Math.min(1, Math.pow(tempo / TEMPO_CONSTRUCAO, 1.6));
 
-      // a poeira migra para o tubo: ao rolar, voa até as bolinhas e vira o fluxo
-      const e2 = suave(0, 1, q2);
-      const entrega = suave(0.8, 1, q2); // as bolinhas do tubo acendem enquanto a poeira se apaga
-      fluxo.vis = reduzir || !tr ? 1 : entrega;
-      if (q2 <= 0) idBase = -1;
-      else if (idBase < 0 && fluxo.n > 0) idBase = fluxo.ids[0]!;
+      // sentido da rolagem: descendo, a poeira é sugada para a entrada do tubo; subindo, sai pela saída e volta à hero
+      if (q2 !== qAnterior) {
+        sentido = q2 > qAnterior ? 1 : -1;
+        qAnterior = q2;
+      }
+      via += ((sentido > 0 ? 0 : 1) - via) * (1 - Math.exp(-dtq * 3.5));
+      // o fluxo dentro do tubo cresce conforme a poeira chega
+      fluxo.vis = reduzir || !tr ? 1 : suave(0.35, 1, q2);
+      const entradaX = tr ? tr.left + fluxo.entradaX : 0;
+      const entradaY = tr ? tr.top + fluxo.entradaY : 0;
+      const saidaX = tr ? tr.left + fluxo.saidaX : 0;
+      const saidaY = tr ? tr.top + fluxo.saidaY : 0;
+      const alvoX = lerp(entradaX, saidaX, via);
+      const alvoY = lerp(entradaY, saidaY, via);
 
       // dispersão ao rolar para além da hero
       const disp = reduzir
@@ -138,16 +150,18 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
           ty += Math.sin(a) * disp * S * (0.3 + q * 0.7) - disp * S * 0.25;
         }
 
-        // voo até a bolinha do tubo a que esta partícula foi destinada
-        let destinada = false;
-        if (q2 > 0 && idBase >= 0 && tr) {
-          const idx = idBase + atrib[i]! - fluxo.ids[0]!;
-          if (idx >= 0 && idx < fluxo.n) {
-            // o caminho faz uma curva leve, diferente para cada partícula
-            const arco = Math.sin(e2 * Math.PI) * S * 0.25 * (q - 0.5);
-            tx = lerp(tx, tr.left + fluxo.xs[idx]!, e2) + Math.cos(a) * arco;
-            ty = lerp(ty, tr.top + fluxo.ys[idx]!, e2) + Math.sin(a) * arco;
-            destinada = true;
+        // migração: cada partícula parte numa hora diferente (desl) e acelera como se fosse atraída por um ímã
+        let fi = 0;
+        if (q2 > 0 && tr) {
+          fi = clamp01((q2 - desl[i]!) / 0.4);
+          if (fi > 0) {
+            const p = fi * fi * (3 - 2 * fi);
+            const puxa = Math.pow(p, 1.5);
+            // curva leve e diferente para cada partícula; perto do destino, espalha-se dentro da largura do tubo
+            const arco = Math.sin(p * Math.PI) * S * 0.3 * (q - 0.5);
+            const gy = alvoY + lado[i]! * fluxo.larguraEntrada * 0.8;
+            tx = lerp(tx, alvoX, puxa) + Math.cos(a) * arco;
+            ty = lerp(ty, gy, puxa) + Math.sin(a) * arco;
           }
         }
 
@@ -161,7 +175,7 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
           y[i] = y[i]! + Math.cos(tempo * 0.4 + a * 3) * 0.12;
         } else {
           let k = reduzir ? 1 : 1 - Math.exp(-(1.4 + e * 3.2) * dtq);
-          if (destinada) k = lerp(k, 1, e2 * e2); // perto da chegada, acompanha a bolinha sem atraso
+          if (fi > 0) k = lerp(k, 1, fi * fi); // em voo, acompanha o ímã sem atraso
           x[i] = x[i]! + (tx - x[i]!) * k;
           y[i] = y[i]! + (ty - y[i]!) * k;
         }
@@ -181,23 +195,52 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
         let alfa =
           (((amarela ? 0.95 : 0.82) + q * 0.2 + brilho * 0.5) * e + 0.22 * (1 - e)) * (1 - disp);
         let sz = tam * (0.8 + q * 0.7) * (1 + brilho * 0.6);
-        let cor = amarela ? AMARELO : BRANCO;
-        if (q2 > 0) {
-          if (destinada) {
-            // vira amarela e cresce até o tamanho da bolinha; some quando a bolinha do tubo acende
-            alfa = Math.max(alfa, 0.55 * e2) * (1 - entrega);
-            sz += (fluxo.raio * 2 - sz) * e2 * e2 * e2;
-            if (!amarela)
-              cor = `255,${Math.round(lerp(255, 202, e2))},${Math.round(lerp(255, 10, e2))}`;
-          } else alfa *= 1 - e2; // sem bolinha para virar: a poeira se dissipa
+        if (fi > 0) {
+          // ao chegar ao tubo, a partícula se funde ao fluxo de poeira dele
+          alfa = Math.max(alfa, 0.6) * (1 - suave(0.86, 1, fi));
+          sz = lerp(sz, Math.max(1.1, fluxo.raio * 0.5), fi);
         }
         if (alfa <= 0.01) continue;
-        ctx.fillStyle = `rgba(${cor},${alfa})`;
-        if (sz > 2.2) {
-          ctx.beginPath();
-          ctx.arc(x[i]!, y[i]!, sz / 2, 0, Math.PI * 2);
-          ctx.fill();
-        } else ctx.fillRect(x[i]! - sz / 2, y[i]! - sz / 2, sz, sz);
+        ctx.fillStyle = `rgba(${amarela ? AMARELO : BRANCO},${alfa})`;
+        ctx.fillRect(x[i]! - sz / 2, y[i]! - sz / 2, sz, sz);
+      }
+
+      // brilho do ímã na entrada (ou na saída) do tubo enquanto a poeira passa
+      if (tr && q2 > 0 && q2 < 1) {
+        const inten = Math.sin(clamp01((q2 - 0.2) / 0.75) * Math.PI);
+        if (inten > 0.02) {
+          const rad = Math.max(60, fluxo.larguraEntrada * 2.2);
+          const g = ctx.createRadialGradient(alvoX, alvoY, 0, alvoX, alvoY, rad);
+          g.addColorStop(0, `rgba(${AMARELO},${0.28 * inten})`);
+          g.addColorStop(1, `rgba(${AMARELO},0)`);
+          ctx.fillStyle = g;
+          ctx.fillRect(alvoX - rad, alvoY - rad, rad * 2, rad * 2);
+        }
+      }
+
+      // "BLACK SHEEP": depois de completa a ovelha, o nome aparece como texto sólido preto no pescoço
+      const pronto = reduzir ? 1 : suave(TEMPO_CONSTRUCAO + 2.2, TEMPO_CONSTRUCAO + 3.4, tempo);
+      const aTexto = pronto * (1 - disp) * (1 - clamp01(q2 * 6));
+      if (aTexto > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = aTexto;
+        ctx.fillStyle = "#000";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `500 ${(dH * 0.05 * S) / dW}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif`;
+        try {
+          (ctx as unknown as { letterSpacing: string }).letterSpacing =
+            `${(dH * 0.012 * S) / dW}px`;
+        } catch {
+          /* sem suporte */
+        }
+        for (const [txt, fy] of [
+          ["BLACK", 0.752],
+          ["SHEEP", 0.806],
+        ] as const) {
+          ctx.fillText(txt, cx, cy + (fy - 0.5) * (dH / dW) * S * respira);
+        }
+        ctx.restore();
       }
     };
 
@@ -293,6 +336,8 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
           pts.push(d.p[k]!, d.p[k + 1]!, d.p[k + 2]!);
         }
         d = { ...d, p: pts };
+        dW = d.w;
+        dH = d.h;
         n = d.p.length / 3;
         nx = new Float32Array(n);
         ny = new Float32Array(n);
@@ -303,7 +348,8 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
         ini = new Float32Array(n);
         dur = new Float32Array(n);
         lim = new Float32Array(n);
-        atrib = new Uint32Array(n);
+        desl = new Float32Array(n);
+        lado = new Float32Array(n);
         tipo = new Uint8Array(n);
         for (let i = 0; i < n; i++) {
           nx[i] = d.p[i * 3]! / d.w - 0.5;
@@ -313,18 +359,12 @@ export function OvelhaParticulas({ className = "" }: { className?: string }) {
           rnd[i] = Math.random();
           x[i] = Math.random() * cw;
           y[i] = Math.random() * ch;
-          atrib[i] = i;
+          desl[i] = Math.random() * 0.6;
+          lado[i] = Math.random() * 2 - 1;
           dur[i] = 1.2 + Math.random() * 1.0;
           ini[i] = reduzir ? 0 : -1;
           // ordem de construção: do centro (rosto) para fora (lã), com um pouco de acaso
           lim[i] = Math.min(1, Math.hypot(nx[i]!, ny[i]!) / 0.5) * 0.82 + Math.random() * 0.18;
-        }
-        // sorteia qual partícula vira qual bolinha (embaralha 0..n-1)
-        for (let i = n - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          const t = atrib[i]!;
-          atrib[i] = atrib[j]!;
-          atrib[j] = t;
         }
         desenhar();
         tocar();

@@ -1,4 +1,4 @@
-import { fluxo, MAX_BOLINHAS } from "@/lib/fluxo-poeira";
+import { fluxo } from "@/lib/fluxo-poeira";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -39,6 +39,17 @@ const DD = R * 2 * 1.55; // diâmetro com folga (bolinhas respiram, mesmo na fil
 const V = 260; // velocidade livre (unidades por segundo)
 const CICLO = 40;
 const AMARELO = "253,202,10";
+
+const GRAOS = 9; // grãos de poeira por bolinha da simulação
+const hash = (n: number) => {
+  let a = n | 0;
+  a = a ^ 61 ^ (a >>> 16);
+  a = (a + (a << 3)) | 0;
+  a = a ^ (a >>> 4);
+  a = Math.imul(a, 0x27d4eb2d);
+  a = a ^ (a >>> 15);
+  return (a >>> 0) / 4294967296;
+};
 
 type Bola = { id: number; u: number; v: number; vel: number };
 
@@ -379,39 +390,47 @@ export function MotionRestricoes() {
       parede(base, zr * ZL - 12, (zr + 1) * ZL + 12);
       ctx.shadowBlur = 0;
 
-      // bolinhas (em três faixas de brilho: paradas escurecem, em movimento acendem)
-      const faixas: Array<{ a: number; pts: Array<[number, number]> }> = [
-        { a: 0.42, pts: [] },
-        { a: 0.7, pts: [] },
-        { a: 1, pts: [] },
-      ];
-      let nPub = 0;
-      for (const b of s.bolas) {
-        if (b.u < -2) continue;
-        const w = largura(b.u, s.w);
-        const p = P(b.u, b.v * Math.max(0, w / 2 - R * 1.1));
-        const k = b.vel < V * 0.25 ? 0 : b.vel < V * 0.75 ? 1 : 2;
-        faixas[k]?.pts.push(p);
-        // publica a posição para a poeira da hero, que vira estas bolinhas ao rolar a página
-        if (nPub < MAX_BOLINHAS) {
-          fluxo.ids[nPub] = b.id;
-          fluxo.xs[nPub] = p[0];
-          fluxo.ys[nPub] = p[1];
-          nPub++;
-        }
-      }
-      fluxo.n = nPub;
+      // poeira cósmica: cada bolinha da simulação vira uma nuvenzinha de grãos (paradas escurecem, em movimento acendem)
       const raio = Math.max(1.5, R * sc);
       fluxo.raio = raio;
-      for (const f of faixas) {
-        if (fluxo.vis < 0.01) break;
-        ctx.fillStyle = `rgba(${AMARELO},${f.a * fluxo.vis})`;
-        ctx.beginPath();
-        for (const [x, y] of f.pts) {
-          ctx.moveTo(x + raio, y);
-          ctx.arc(x, y, raio, 0, Math.PI * 2);
+      {
+        const [ex, ey] = P(0, 0);
+        const [sx, sy] = P(L, 0);
+        fluxo.entradaX = ex;
+        fluxo.entradaY = ey;
+        fluxo.saidaX = sx;
+        fluxo.saidaY = sy;
+        fluxo.larguraEntrada = ((s.w[0] ?? 0) / 2) * sc;
+      }
+      if (fluxo.vis >= 0.01) {
+        // buckets por (faixa de brilho, cor) para trocar o estilo de preenchimento só 6 vezes por quadro
+        const baldes: number[][] = [[], [], [], [], [], []];
+        const brilho = [0.45, 0.72, 1];
+        const grao = Math.max(1.1, sc * 1.7);
+        for (const b of s.bolas) {
+          if (b.u < -2) continue;
+          const w = largura(b.u, s.w);
+          const [bx, by] = P(b.u, b.v * Math.max(0, w / 2 - R * 1.1));
+          const k = b.vel < V * 0.25 ? 0 : b.vel < V * 0.75 ? 1 : 2;
+          for (let g = 0; g < GRAOS; g++) {
+            const h1 = hash(b.id * 31 + g * 7 + 1);
+            const h2 = hash(b.id * 17 + g * 13 + 5);
+            const h3 = hash(b.id * 11 + g * 3 + 9);
+            const ang = h1 * Math.PI * 2;
+            const dist = Math.sqrt(h2) * raio * 1.25;
+            const x = bx + Math.cos(ang) * dist + Math.sin(s.relogio * 2.2 + h3 * 20) * 0.6;
+            const y = by + Math.sin(ang) * dist + Math.cos(s.relogio * 1.9 + h1 * 20) * 0.6;
+            const tam = grao * (0.7 + h3 * 0.9);
+            baldes[k * 2 + (h3 < 0.62 ? 0 : 1)]?.push(x - tam / 2, y - tam / 2, tam);
+          }
         }
-        ctx.fill();
+        baldes.forEach((lista, idx) => {
+          if (!lista.length) return;
+          const amarelo = idx % 2 === 0;
+          ctx.fillStyle = `rgba(${amarelo ? AMARELO : "255,255,255"},${(brilho[idx >> 1] ?? 1) * fluxo.vis * (amarelo ? 1 : 0.85)})`;
+          for (let i = 0; i < lista.length; i += 3)
+            ctx.fillRect(lista[i]!, lista[i + 1]!, lista[i + 2]!, lista[i + 2]!);
+        });
       }
 
       // rótulos das zonas
