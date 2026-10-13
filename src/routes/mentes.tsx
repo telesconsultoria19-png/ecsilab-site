@@ -6,7 +6,7 @@ import { seo } from "@/lib/seo";
 export const Route = createFileRoute("/mentes")({
   head: () =>
     seo({
-      titulo: "Mentes | Quem está por trás do método Rares",
+      titulo: "Mentes e Método | Quem está por trás da Écsilab e o método Rares",
       descricao:
         "Conheça Marcelo Teles e Marcos Schneider, as mentes por trás da Écsilab e do método Rares (rastreável, replicável e escalável), potencializadas por inteligência artificial.",
       caminho: "/mentes",

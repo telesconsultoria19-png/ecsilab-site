@@ -6,9 +6,8 @@ const idDe = (href: string) => href.split("#")[1] ?? "";
 
 export const NAV: Array<{ href: string; label: string; pagina?: boolean; destaque?: boolean }> = [
   { href: "/", label: "Home", pagina: true },
-  { href: "/mentes", label: "Mentes", pagina: true },
+  { href: "/mentes", label: "Mentes e Método", pagina: true },
   { href: "/#diagnostico", label: "Diagnóstico" },
-  { href: "/#metodo", label: "Método" },
   { href: "/solucoes", label: "Soluções", pagina: true },
   { href: "/enterprise", label: "Enterprise", pagina: true, destaque: true },
   { href: "/#contato", label: "Contato" },
