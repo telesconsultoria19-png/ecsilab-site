@@ -1,5 +1,6 @@
 import { Fio } from "@/components/animated-icons";
-import { CountUp, Section } from "@/components/ui-bits";
+import { ResultadosMarcelo } from "@/components/resultados-marcelo";
+import { Section } from "@/components/ui-bits";
 
 const TIME = [
   {
@@ -21,12 +22,7 @@ const TIME = [
       "Método Rares: processos rastreáveis, replicáveis e escaláveis",
       "Tráfego, funil e máquina de vendas",
     ],
-    numeros: [{ v: 250, prefix: "+", suffix: "", d: 0, l: "consultorias realizadas" }],
-    roi: [
-      { v: 9, d: 0 },
-      { v: 21, d: 0 },
-      { v: 37.1, d: 1 },
-    ] as Array<{ v: number; d: number }> | undefined,
+    resultados: true,
   },
   {
     foto: "/marcos-schneider.jpg" as string | null,
@@ -43,8 +39,7 @@ const TIME = [
       "Modelagem de negócio e de receita",
       "Operação e governança do crescimento",
     ],
-    numeros: [] as Array<{ v: number; prefix: string; suffix: string; d: number; l: string }>,
-    roi: undefined as Array<{ v: number; d: number }> | undefined,
+    resultados: false,
   },
 ];
 
@@ -116,34 +111,7 @@ export function Mentes() {
                 </>
               )}
 
-              {s.numeros.length > 0 && (
-                <dl className="mt-8 grid grid-cols-2 gap-4 pt-2">
-                  {s.numeros.map((n) => (
-                    <div key={n.l}>
-                      <dt className="text-4xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)]">
-                        <CountUp value={n.v} prefix={n.prefix} suffix={n.suffix} decimals={n.d} />
-                      </dt>
-                      <dd className="mt-1 text-sm text-paper/70">{n.l}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
-
-              {s.roi && (
-                <div className="mt-6">
-                  <p className="text-sm text-paper/70">
-                    Escalabilidade de negócios alcançada, com ROI de
-                  </p>
-                  <p className="mt-1 flex flex-wrap items-baseline gap-x-5 gap-y-1 text-4xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)]">
-                    {s.roi.map((r) => (
-                      <span key={r.v}>
-                        <CountUp value={r.v} suffix="x" decimals={r.d} duration={2200} />
-                      </span>
-                    ))}
-                  </p>
-                  <p className="mt-1 text-sm text-paper/70">o valor investido</p>
-                </div>
-              )}
+              {s.resultados && <ResultadosMarcelo />}
             </div>
           </article>
         ))}
