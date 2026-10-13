@@ -1,4 +1,3 @@
-import { Pause, Play } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { Eyebrow } from "@/components/ui-bits";
@@ -128,18 +127,15 @@ export function MentesHero() {
           melhor do talento humano, para garantir cada entrega.
         </p>
 
+        {/* sem botão visível: a pausa aparece só para quem navega pelo teclado */}
         {!reduzido && (
           <button
             type="button"
             onClick={alternar}
-            aria-label={pausado ? "Reproduzir a animação do título" : "Pausar a animação do título"}
-            className="mt-6 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-paper backdrop-blur transition hover:bg-white/20 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            aria-pressed={pausado}
+            className="sr-only focus-visible:not-sr-only focus-visible:mt-6 focus-visible:rounded-full focus-visible:bg-white/10 focus-visible:px-4 focus-visible:py-3 focus-visible:text-sm focus-visible:font-semibold focus-visible:text-paper"
           >
-            {pausado ? (
-              <Play size={18} aria-hidden="true" />
-            ) : (
-              <Pause size={18} aria-hidden="true" />
-            )}
+            {pausado ? "Reproduzir a animação do título" : "Pausar a animação do título"}
           </button>
         )}
       </div>

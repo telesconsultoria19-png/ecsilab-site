@@ -2,31 +2,30 @@ import { useEffect, useRef, useState } from "react";
 
 import { CountUp } from "@/components/ui-bits";
 
-// ROI sobre o valor investido, medido em períodos de 12 meses. Em ordem crescente, para formar a escada.
+// ROI sobre o valor investido, medido em períodos de 12 meses. Do maior para o menor.
 const ROIS = [
-  { v: 7, d: 0, nome: "Clínica estética", tipo: "produtos e serviços" },
+  { v: 37.1, d: 1, nome: "Gestão 360", tipo: "serviço" },
   { v: 21, d: 0, nome: "MS Consulting", tipo: "serviço" },
-  { v: 37.1, d: 1, nome: "Gestão 360", tipo: "serviço", href: "/#case" },
+  { v: 7, d: 0, nome: "Clínica estética", tipo: "produtos e serviços" },
 ];
 const MAIOR = Math.max(...ROIS.map((r) => r.v));
-const ALTURA_BARRA = 150; // px da barra mais alta
 
-/** Faixa de resultados do Marcelo: números grandes e uma escada de ROI que sobe quando aparece na tela. */
+/** Resultados do Marcelo, em versão minimalista: dois números e barras horizontais que crescem quando aparecem na tela. */
 export function ResultadosMarcelo() {
   const raiz = useRef<HTMLDivElement>(null);
-  const [subiu, setSubiu] = useState(false);
+  const [cresceu, setCresceu] = useState(false);
 
   useEffect(() => {
     const el = raiz.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setSubiu(true);
+      setCresceu(true);
       return;
     }
     const io = new IntersectionObserver(
       ([e]) => {
         if (e?.isIntersecting) {
-          setSubiu(true);
+          setCresceu(true);
           io.disconnect();
         }
       },
@@ -37,62 +36,62 @@ export function ResultadosMarcelo() {
   }, []);
 
   return (
-    <div ref={raiz} className="mt-10 rounded-2xl bg-white/[0.04] p-6 sm:p-8">
-      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-accent">Resultados</p>
-
-      <dl className="mt-5 grid grid-cols-2 gap-6">
+    <div ref={raiz} className="mt-10">
+      <dl className="flex flex-wrap gap-x-12 gap-y-4">
         <div>
-          <dt className="text-5xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)]">
+          <dt className="text-4xl font-extrabold text-accent">
             <CountUp value={250} prefix="+" />
           </dt>
-          <dd className="mt-1 text-sm text-paper/70">consultorias realizadas</dd>
+          <dd className="mt-0.5 text-sm text-paper/60">consultorias realizadas</dd>
         </div>
         <div>
-          <dt className="text-5xl font-extrabold text-accent drop-shadow-[0_0_14px_rgba(253,202,10,0.45)]">
+          <dt className="text-4xl font-extrabold text-accent">
             <CountUp value={11} />
           </dt>
-          <dd className="mt-1 text-sm text-paper/70">anos de carreira</dd>
+          <dd className="mt-0.5 text-sm text-paper/60">anos de carreira</dd>
         </div>
       </dl>
 
       <div className="mt-9">
-        <p className="text-sm font-semibold text-paper">ROI sobre o valor investido, em 12 meses</p>
-        <ol className="mt-5 grid grid-cols-3 gap-3 sm:gap-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-paper/50">
+          ROI sobre o valor investido, em 12 meses
+        </p>
+        <ul className="mt-5 space-y-5">
           {ROIS.map((r, i) => {
             const maior = r.v === MAIOR;
             return (
-              <li key={r.nome} className="flex flex-col items-center justify-end text-center">
-                <span
-                  className={`mb-2 text-3xl font-extrabold sm:text-4xl ${maior ? "text-accent drop-shadow-[0_0_16px_rgba(253,202,10,0.6)]" : "text-paper"}`}
-                >
-                  <CountUp value={r.v} suffix="x" decimals={r.d} duration={1800 + i * 300} />
-                </span>
-                <div
-                  className="flex w-full items-end justify-center"
-                  style={{ height: ALTURA_BARRA }}
-                >
+              <li key={r.nome}>
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-sm text-paper/80">
+                    <span className="font-semibold text-paper">{r.nome}</span>
+                    <span className="text-paper/50"> · {r.tipo}</span>
+                  </p>
+                  <span
+                    className={`text-xl font-extrabold tabular-nums ${maior ? "text-accent" : "text-paper"}`}
+                  >
+                    <CountUp value={r.v} suffix="x" decimals={r.d} duration={1600 + i * 300} />
+                  </span>
+                </div>
+                <div className="mt-2 h-1 w-full rounded-full bg-white/10" aria-hidden="true">
                   <div
-                    aria-hidden="true"
-                    className={`w-full rounded-t-xl ${maior ? "bg-gradient-to-t from-accent/40 to-accent shadow-[0_0_30px_-4px_rgba(253,202,10,0.6)]" : "bg-gradient-to-t from-white/10 to-white/35"}`}
+                    className={`h-full rounded-full ${maior ? "bg-accent shadow-[0_0_12px_rgba(253,202,10,0.6)]" : "bg-white/45"}`}
                     style={{
-                      height: subiu ? Math.max(14, (r.v / MAIOR) * ALTURA_BARRA) : 0,
-                      transition: `height 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 0.25}s`,
+                      width: cresceu ? `${(r.v / MAIOR) * 100}%` : "0%",
+                      transition: `width 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${i * 0.25}s`,
                     }}
                   />
                 </div>
-                <p className="mt-3 text-sm font-bold leading-tight text-paper">{r.nome}</p>
-                <p className="text-xs leading-tight text-paper/60">{r.tipo}</p>
               </li>
             );
           })}
-        </ol>
-        <p className="mt-6 text-xs leading-relaxed text-paper/50">
+        </ul>
+        <p className="mt-6 text-xs leading-relaxed text-paper/45">
           Resultados de clientes específicos, medidos em períodos de 12 meses. Cada caso depende do
           cenário e da execução.
         </p>
         <a
           href="/#case"
-          className="mt-4 inline-block text-sm font-semibold text-accent hover:underline"
+          className="mt-3 inline-block text-sm font-semibold text-accent hover:underline"
         >
           Ver o case Gestão 360 →
         </a>
