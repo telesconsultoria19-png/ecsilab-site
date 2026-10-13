@@ -85,16 +85,6 @@ export function ResultadosMarcelo() {
             );
           })}
         </ul>
-        <p className="mt-6 text-xs leading-relaxed text-paper/45">
-          Resultados de clientes específicos, medidos em períodos de 12 meses. Cada caso depende do
-          cenário e da execução.
-        </p>
-        <a
-          href="/#case"
-          className="mt-3 inline-block text-sm font-semibold text-accent hover:underline"
-        >
-          Ver o case Gestão 360 →
-        </a>
       </div>
     </div>
   );
