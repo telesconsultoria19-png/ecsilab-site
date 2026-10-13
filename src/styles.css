@@ -302,3 +302,53 @@ section[id] {
 @media (prefers-reduced-motion: reduce) {
   .shimmer-text-claro { animation: none; }
 }
+
+/* Ecossistema da hero Enterprise (mesmo desenho da órbita da Tittanium): cartões flutuando em volta do centro */
+.eco-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: 0;
+  transform-origin: 0 50%;
+  transform: translateY(-50%) rotate(var(--angulo));
+  z-index: 1;
+}
+.eco-card {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: var(--card);
+  height: var(--card);
+  transform: translate(-50%, -50%) rotate(calc(-1 * var(--angulo)));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 18px;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.1),
+    0 4px 14px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 10;
+  cursor: default;
+  animation: eco-flutua 4s ease-in-out infinite;
+}
+.eco-card:hover {
+  animation-play-state: paused;
+  background-color: #fafafa;
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+  z-index: 20;
+}
+@keyframes eco-flutua {
+  0%, 100% { transform: translate(-50%, -50%) rotate(calc(-1 * var(--angulo))) translateY(0); }
+  50% { transform: translate(-50%, -50%) rotate(calc(-1 * var(--angulo))) translateY(-7px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eco-card { animation: none; }
+}
